@@ -7,8 +7,10 @@
 class ResetComponent : public Component
 {
 public:
-	ResetComponent(BoardComponent* inBoard);
+	ResetComponent() : myBoard(nullptr) { setBounds(550, 20, 50, 50); }
+	void SetBoard(Board* in_board) { myBoard = in_board; }
 	void mouseDown(const MouseEvent &event) override;
+	void paint(Graphics& g) override;
 private:
 	Board* myBoard;
 	//==============================================================================
@@ -22,6 +24,7 @@ public:
 	void LoadImages();
 	void paint(Graphics& g) override;
 	void mouseDown(const MouseEvent &event) override;
+	Board* GetBoard() { return myBoard; }
 private:
 	Board* myBoard;
 	juce::Point<int> activeSquare;

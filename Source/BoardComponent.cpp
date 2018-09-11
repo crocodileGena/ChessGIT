@@ -126,13 +126,18 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 	repaint();
 }
 
-ResetComponent::ResetComponent(BoardComponent* inBoard) : myBoard(inBoard)
-{
-	setBounds(550, 20, 50, 50);
-}
+//ResetComponent::ResetComponent(Board* inBoard) : myBoard(inBoard)
+//{
+//	setBounds(550, 20, 50, 50);
+//}
 
-void ResetComponent::mouseDown(const MouseEvent &event)
+void ResetComponent::mouseDown(const MouseEvent &/*event*/)
 {
 	myBoard->ResetBoard();
 	repaint();
+}
+
+void ResetComponent::paint(Graphics& g)
+{
+	g.drawText("Reset", getLocalBounds(), Justification::centred, true);
 }

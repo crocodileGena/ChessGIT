@@ -2,7 +2,7 @@
 #include "Pieces.h"
 
 int drawOffset = 18;
-BoardComponent::BoardComponent() : activeSquare(0,0)
+BoardComponent::BoardComponent() : activeSquare(kIllegalSquare, kIllegalSquare)
 {
 	myBoard = new Board;
 	myBoard->ResetBoard();
@@ -112,10 +112,18 @@ void BoardComponent::paint(Graphics& g)
 void BoardComponent::mouseDown(const MouseEvent &event)
 {
 	Square origin({ activeSquare.getX(), 7 -activeSquare.getY() });
-	juce::Point<int> currPosition = event.getPosition();
-	activeSquare.setX((currPosition.getX() - drawOffset) / 60);
-	activeSquare.setY((currPosition.getY() - drawOffset) / 60);
-	Square dest({ activeSquare.getX(), 7 - activeSquare.getY() });
+	juce::Point<int> destPos = event.getPosition();
+
+	auto destX = (destPos.getX() - drawOffset) / 60;
+	auto destY = (destPos.getY() - drawOffset) / 60;
+
+	if (destPos.getX() - drawOffset < 0 || destPos.getY() - drawOffset < 0
+		|| destX > 7 || destX < 0 || destY > 7 || destY < 0)
+		destX = kIllegalSquare;
+
+	activeSquare.setX(destX);
+	activeSquare.setY(destY);
+	Square dest({ destX, 7 -destY });
 
 	if (origin == dest)
 		activeSquare.setX(kIllegalSquare);

@@ -2,7 +2,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "board.h"
 
-#define kIllegalSquare 9
+#define kIllegalSquare 8
 
 class ResetComponent : public Component
 {

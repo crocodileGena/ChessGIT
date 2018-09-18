@@ -134,10 +134,10 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 }
 
 
-void ResetButton::mouseDown(const MouseEvent &/*event*/)
+void ResetButton::mouseDown(const MouseEvent &event)
 {
 	myBoard->ResetBoard();
-	repaint();
+	Button::mouseDown(event);
 }
 
 void ResetButton::paint(Graphics& g)

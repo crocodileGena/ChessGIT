@@ -16,7 +16,7 @@ MainComponent::MainComponent()
 	addAndMakeVisible(gameNotation);
 	resetBoard.SetBoard(boardGUI.GetBoard());
 	boardStatus.SetBoard(boardGUI.GetBoard());
-	resetBoard.onClick = [this] { funny(); };
+	resetBoard.onClick = [this] { boardGUI.repaint(); };
     setSize (800, 600);
 }
 

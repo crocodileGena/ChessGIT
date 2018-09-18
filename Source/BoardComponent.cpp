@@ -143,7 +143,7 @@ void ResetComponent::mouseDown(const MouseEvent &/*event*/)
 void ResetComponent::paint(Graphics& g)
 {
 	g.setColour(Colours::white);
-	g.drawText("Reset", getLocalBounds(), Justification::centred, true);
+	g.drawText("Reset Button", getLocalBounds(), Justification::centred, true);
 }
 
 void StatusComponent::paint(Graphics& g)

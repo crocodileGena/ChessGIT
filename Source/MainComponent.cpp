@@ -43,8 +43,8 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 	boardGUI.setBounds(0, 0, 515, 515);
-	resetBoard.setBounds(550, 20, 50, 50);
-	boardStatus.setBounds(20, 550, 50, 50);
+	resetBoard.setBounds(550, 20, 100, 20);
+	boardStatus.setBounds(20, 520, 100, 20);
 	gameNotation.setBounds(100, 100, 100, 400);
 	juce::Parallelogram<float> bb({ 550.0f, 100.0f }, { 700.0f, 100.0f }, { 550.0f, 200.0f });
 	gameNotation.setBoundingBox(bb);

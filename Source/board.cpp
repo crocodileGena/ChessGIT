@@ -27,7 +27,7 @@ void Board::PrintPiecesSum()
 		<< blackSum << ". Overall: " << sign
 		<< overall << std::endl;
 }
-Board::Board() : m_lastColorMoved(eBlack)
+Board::Board() : m_lastColorMoved(eBlack), m_status("ok now")
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)

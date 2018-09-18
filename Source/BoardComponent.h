@@ -7,7 +7,7 @@
 class ResetComponent : public Component
 {
 public:
-	ResetComponent() : myBoard(nullptr) { setBounds(550, 20, 50, 50); }
+	ResetComponent() : myBoard(nullptr) {}
 	void SetBoard(Board* in_board) { myBoard = in_board; }
 	void mouseDown(const MouseEvent &event) override;
 	void paint(Graphics& g) override;
@@ -15,6 +15,18 @@ private:
 	Board* myBoard;
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ResetComponent)
+};
+
+class StatusComponent : public Component
+{
+public:
+	StatusComponent() : myBoard(nullptr) {}
+	void SetBoard(Board* in_board) { myBoard = in_board; }
+	void paint(Graphics& g) override;
+private:
+	Board* myBoard;
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StatusComponent)
 };
 
 class BoardComponent : public Component

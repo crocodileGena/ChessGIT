@@ -67,8 +67,10 @@ public:
 	void PrintNotation() { m_gameNotation.PrintNotation(); }
 	void PrintPiecesSum();
 	bool CheckIsCheck();
+	std::string GetStatus() { return m_status; }
 
 	int m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];
 	GameNotation m_gameNotation;
+	std::string m_status;
 };

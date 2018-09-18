@@ -12,11 +12,13 @@ MainComponent::MainComponent()
 {
 	addAndMakeVisible(boardGUI);
 	addAndMakeVisible(resetBoard);
+	addAndMakeVisible(boardStatus);
 	addAndMakeVisible(gameNotation);
 	gameNotation.setText("hi hi");
 	gameNotation.setColour(Colours::white);
 	gameNotation.setFont(Font(16.0f), false);
 	resetBoard.SetBoard(boardGUI.GetBoard());
+	boardStatus.SetBoard(boardGUI.GetBoard());
     setSize (800, 600);
 }
 
@@ -42,6 +44,7 @@ void MainComponent::resized()
     // update their positions.
 	boardGUI.setBounds(0, 0, 515, 515);
 	resetBoard.setBounds(550, 20, 50, 50);
+	boardStatus.setBounds(20, 550, 50, 50);
 	gameNotation.setBounds(100, 100, 100, 400);
 	juce::Parallelogram<float> bb({ 550.0f, 100.0f }, { 700.0f, 100.0f }, { 550.0f, 200.0f });
 	gameNotation.setBoundingBox(bb);

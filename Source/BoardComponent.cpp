@@ -6,7 +6,6 @@ BoardComponent::BoardComponent() : activeSquare(kIllegalSquare, kIllegalSquare)
 {
 	myBoard = new Board;
 	myBoard->ResetBoard();
-	setBounds(20, 20, 100, 100);
 
 	LoadImages();
 }
@@ -134,10 +133,6 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 	repaint();
 }
 
-//ResetComponent::ResetComponent(Board* inBoard) : myBoard(inBoard)
-//{
-//	setBounds(550, 20, 50, 50);
-//}
 
 void ResetComponent::mouseDown(const MouseEvent &/*event*/)
 {
@@ -147,5 +142,13 @@ void ResetComponent::mouseDown(const MouseEvent &/*event*/)
 
 void ResetComponent::paint(Graphics& g)
 {
+	g.setColour(Colours::white);
 	g.drawText("Reset", getLocalBounds(), Justification::centred, true);
+}
+
+void StatusComponent::paint(Graphics& g)
+{
+	auto currStatus= myBoard->GetStatus();
+	g.setColour(Colours::white);
+	g.drawText(currStatus, getLocalBounds(), Justification::centred, true);
 }

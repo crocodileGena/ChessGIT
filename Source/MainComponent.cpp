@@ -8,14 +8,17 @@
 
 #include "MainComponent.h"
 //==============================================================================
-MainComponent::MainComponent()
+MainComponent::MainComponent() : 
+boardGUI(), 
+gameNotation(boardGUI.GetBoard()),
+resetBoard(boardGUI.GetBoard()),
+boardStatus(boardGUI.GetBoard())
 {
 	addAndMakeVisible(boardGUI);
 	addAndMakeVisible(resetBoard);
 	addAndMakeVisible(boardStatus);
 	addAndMakeVisible(gameNotation);
-	resetBoard.SetBoard(boardGUI.GetBoard());
-	boardStatus.SetBoard(boardGUI.GetBoard());
+
 	resetBoard.onClick = [this] { boardGUI.repaint(); };
     setSize (800, 600);
 }

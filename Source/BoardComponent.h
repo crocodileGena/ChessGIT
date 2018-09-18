@@ -7,8 +7,7 @@
 class ResetButton : public TextButton
 {
 public:
-	ResetButton() : myBoard(nullptr) {}
-	void SetBoard(Board* in_board) { myBoard = in_board; }
+	ResetButton(Board* inBoard) : myBoard(inBoard) {}
 	void mouseDown(const MouseEvent &event) override;
 	void paint(Graphics& g) override;
 private:
@@ -20,8 +19,7 @@ private:
 class StatusComponent : public Component
 {
 public:
-	StatusComponent() : myBoard(nullptr) {}
-	void SetBoard(Board* in_board) { myBoard = in_board; }
+	StatusComponent(Board* inBoard) : myBoard(inBoard) {}
 	void paint(Graphics& g) override;
 private:
 	Board* myBoard;
@@ -71,7 +69,7 @@ private:
 class NotationComponent : public Component
 {
 public:
-	NotationComponent();
+	NotationComponent(Board* inBoard);
 	void resized() override;
 	void paint(Graphics& g) override;
 	Board* GetBoard() { return myBoard; }

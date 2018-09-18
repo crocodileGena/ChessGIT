@@ -154,7 +154,7 @@ void StatusComponent::paint(Graphics& g)
 	g.drawText(currStatus, getLocalBounds(), Justification::centred, true);
 }
 
-NotationComponent::NotationComponent()
+NotationComponent::NotationComponent(Board* inBoard) : myBoard(inBoard)
 {
 	addAndMakeVisible(next);
 	addAndMakeVisible(prev);

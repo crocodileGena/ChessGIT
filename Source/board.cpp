@@ -37,6 +37,7 @@ Board::Board() : m_lastColorMoved(eBlack), m_status("status bar")
 }
 void Board::ResetBoard()
 {
+	m_lastColorMoved = eBlack;
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
 		{

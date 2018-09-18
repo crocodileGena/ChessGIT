@@ -25,13 +25,17 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+	void funny()
+	{
+		boardGUI.repaint();
+	}
 
 private:
     //==============================================================================
     // Your private member variables go here...
 	BoardComponent boardGUI;
-	DrawableText gameNotation;
-	ResetComponent resetBoard;
+	NotationComponent gameNotation;
+	ResetButton resetBoard;
 	StatusComponent boardStatus;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

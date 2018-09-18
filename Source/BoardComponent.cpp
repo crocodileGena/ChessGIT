@@ -134,15 +134,16 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 }
 
 
-void ResetComponent::mouseDown(const MouseEvent &/*event*/)
+void ResetButton::mouseDown(const MouseEvent &/*event*/)
 {
 	myBoard->ResetBoard();
 	repaint();
 }
 
-void ResetComponent::paint(Graphics& g)
+void ResetButton::paint(Graphics& g)
 {
 	g.setColour(Colours::white);
+	g.drawRect(getLocalBounds());
 	g.drawText("Reset Button", getLocalBounds(), Justification::centred, true);
 }
 
@@ -151,4 +152,94 @@ void StatusComponent::paint(Graphics& g)
 	auto currStatus= myBoard->GetStatus();
 	g.setColour(Colours::white);
 	g.drawText(currStatus, getLocalBounds(), Justification::centred, true);
+}
+
+NotationComponent::NotationComponent()
+{
+	addAndMakeVisible(next);
+	addAndMakeVisible(prev);
+	
+	auto dummyState = new BoardStateComponent;
+	auto dummyState1 = new BoardStateComponent;
+	auto dummyState2 = new BoardStateComponent;
+	auto dummyState3 = new BoardStateComponent;
+	auto dummyState4 = new BoardStateComponent;
+
+	boardStates.add(dummyState);
+	boardStates.add(dummyState1);
+	boardStates.add(dummyState2);
+	boardStates.add(dummyState3);
+	boardStates.add(dummyState4);
+	addAndMakeVisible(*dummyState);
+	addAndMakeVisible(*dummyState1);
+	addAndMakeVisible(*dummyState2);
+	addAndMakeVisible(*dummyState3);
+	addAndMakeVisible(*dummyState4);
+
+}
+
+void NotationComponent::paint(Graphics& g)
+{
+	g.setColour(Colours::white);
+	g.drawRect(getLocalBounds());
+}
+
+void NotationComponent::resized()
+{
+	auto componentBounds(getLocalBounds());
+	int buttonSize(30);
+	int spacing(5);
+	Rectangle<int> currRect(spacing, componentBounds.getBottom() - buttonSize - spacing, buttonSize, buttonSize);
+	prev.setBounds(currRect);
+	currRect.setX(currRect.getRight() + spacing);
+	next.setBounds(currRect);
+
+	int xWhite(10);
+	int xBlack(100);
+	int yPos(10);
+	int xPos(xWhite);
+	int moveNumber(1);
+	for (auto currState : boardStates)
+	{
+		if (moveNumber % 2)
+		{
+			yPos = yPos + 25;
+			xPos = xWhite;
+		}
+		else
+		{
+			xPos = xBlack;
+		}
+
+		currState->setBounds(xPos, yPos, 50, 20);
+		moveNumber++;
+	}
+}
+
+void NextStateComponent::paint(Graphics& g)
+{
+	g.setColour(Colours::white);
+	//g.setOpacity(0.5);
+	g.fillRect(getLocalBounds());
+	g.setColour(Colours::black);
+	g.drawText("next", getLocalBounds(), Justification::centred, true);
+	//g.fillRect(getLocalBounds());
+}
+
+void BoardStateComponent::paint(Graphics& g)
+{
+	g.setColour(Colours::white);
+	//g.setOpacity(0.5);
+	g.fillRect(getLocalBounds());
+	g.setColour(Colours::black);
+	g.drawText("boardState1", getLocalBounds(), Justification::centred, true);
+	//g.fillRect(getLocalBounds());
+}
+
+void PrevStateComponent::paint(Graphics& g)
+{
+	g.setColour(Colours::white);
+	g.fillRect(getLocalBounds());
+	g.setColour(Colours::black);
+	g.drawText("prev", getLocalBounds(), Justification::centred, true);
 }

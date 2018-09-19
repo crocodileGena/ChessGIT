@@ -107,6 +107,27 @@ void Board::PrintBoard()
 
 }
 
+std::string Board::GetPiecesPosition()
+{
+	return ""; //TODO: implement this
+}
+
+int Board::GetCastlingOptions()
+{
+	return 0; //TODO : implemetn this
+}
+
+Square Board::GetEnPassantSquare(const Square inBase, const Square inDest)
+{
+	Square retVal;
+	return retVal; //TODO : implement
+}
+
+int Board::GetHalfmoveClock()
+{
+	return 0; // TODO : implement
+}
+
 void Board::MovePiece(const Square inBase, const Square inDest)
 {
 	bool isPieceMoved = false;
@@ -116,11 +137,20 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 			std::cout << "Same color ";
 		else if (currPiece->MakeMove(*this, inBase, inDest))
 		{
+			const bool isCapture = GetPiece(inDest) != nullptr;
+			const bool specifyRank = false; //TODO : Implement this
+			const bool specifyFile = false; //ToDO : Implement this
+			const bool whitesMove = currPiece->m_color == eWhite;
+			const int castlingOptions = GetCastlingOptions();
+			const Square enPassant = GetEnPassantSquare(inBase, inDest);
+			const int halfmoveClock = GetHalfmoveClock();
 			SetPiece(inBase, nullptr);
 			SetPiece(inDest, currPiece);
 			currPiece->OnPieceMoved();
 			m_lastColorMoved = currPiece->m_color;
-			m_gameNotation.PushMove(currPiece->m_name, static_cast<Color>(currPiece->m_color), inDest);
+			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
+									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
+									enPassant, halfmoveClock);
 
 			isPieceMoved = true;
 		}
@@ -131,40 +161,32 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 		CheckIsCheck();
 }
 
-void GameNotation::PushMove(const std::string in_Name, const Color in_color, const Square inDest)
+std::string GameNotation::GetFENFromPosition(const std::string in_position, const bool whitesMove,
+											const int castlingOptions, const Square enPassant,
+											const int halfmoveClock)
 {
-	if (eWhite == in_color)
-	{
-		NotationNode newNode(in_Name, inDest, m_vNotation.size() + 1);
-		m_vNotation.push_back(newNode);
-	}
-	else
-	{
-		NotationNode& currNode = m_vNotation.back();
-		currNode.UpdateNode(in_Name, inDest);
-	}
+	return ""; //TODO: implement this
+}
+void GameNotation::PushMove(const std::string in_piecesPosition, const std::string pieceName, 
+							const Square in_origin, const Square in_dest, const bool isCapture,
+							const bool specifyRank, const bool specifyFile, const bool whitesMove,
+							const int castlingOptions, const Square enPassant, 
+							const int halfmoveClock)
+{
+	std::string fen = GetFENFromPosition(in_piecesPosition, whitesMove, castlingOptions, enPassant, halfmoveClock);
+	std::string algebraic = GetAlgebraic(in_origin, in_dest, isCapture, specifyRank, specifyFile);
+	NotationNode newNode(algebraic, fen);
+	m_vNotation.push_back(newNode);
 }
 
-void GameNotation::PrintNotation()
+std::string GameNotation::GetAlgebraic(const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile)
 {
-	std::for_each(m_vNotation.begin(), m_vNotation.end(), [](NotationNode currNode) {currNode.Print(); });
+	return ""; //TODO: Implement this
 }
-
-NotationNode::NotationNode(const std::string in_Name, const Square inDest, size_t in_moveNumber) :
-	m_moveNumber(in_moveNumber)
-{
-	m_whiteMove = in_Name + inDest.toString();
-}
-
-void NotationNode::UpdateNode(const std::string in_Name, const Square inDest)
-{
-	m_blackMove = in_Name + inDest.toString();
-}
-
-void NotationNode::Print()
-{
-	std::cout << m_moveNumber << ". " << m_whiteMove << " " << m_blackMove << std::endl;
-}
+//void GameNotation::PrintNotation()
+//{
+//	std::for_each(m_vNotation.begin(), m_vNotation.end(), [](NotationNode currNode) {currNode.Print(); });
+//}
 
 std::string Square::toString() const
 {

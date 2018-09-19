@@ -30,9 +30,14 @@ public:
 	GameNotation() {}
 	~GameNotation() { m_vNotation.clear(); }
 
-	void PushMove(const std::string in_Name, const Color in_color, const Square inDest);
-	void PrintNotation();
-	auto GetLastNode() { return m_vNotation.end(); }
+	void PushMove(const std::string in_piecesPosition, const std::string pieceName,
+		Square in_origin, const Square in_dest, const bool isCapture,
+		const bool specifyRank, const bool specifyFile, const bool whitesMove, 
+		const int castlingOptions, const Square enPassant, const int halfmoveClock);
+	std::string GetFENFromPosition(const std::string in_position, const bool whitesMove,
+									const int castlingOptions, const Square enPassant,
+									const int halfmoveClock);
+	std::string GetAlgebraic(const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile);
 
 private:
 	std::vector<NotationNode> m_vNotation;
@@ -42,20 +47,16 @@ private:
 class NotationNode
 {
 public:
-	NotationNode(const std::string in_Name, const Square inDest, size_t in_moveNumber);
+	NotationNode(const std::string in_algebraic, const std::string in_fen) : 
+		m_algebraic(in_algebraic), m_fen(in_fen) {}
 	~NotationNode() {}
 
-	void UpdateNode(const std::string in_Name, const Square inDest);
-	size_t GetMoveNumber() { return m_moveNumber; }
-	std::string GetWhiteMove() { return m_whiteMove; }
-	std::string GetBlackMove() { return m_blackMove; }
-
-	void Print();
+	std::string GetAlgebraic() { return m_algebraic; }
+	std::string GetFEN() { return m_fen; }
 
 private:
-	size_t m_moveNumber;
-	std::string m_whiteMove;
-	std::string m_blackMove;
+	std::string m_algebraic;	//move
+	std::string m_fen;			//state
 };
 
 class Board
@@ -69,10 +70,13 @@ public:
 	void MovePiece(const Square inBase, const Square inDest);
 	Piece* GetPiece(const Square inLocation);
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetLetter()][inLocation.GetNumber()] = inPiece; }
-	void PrintNotation() { m_gameNotation.PrintNotation(); }
 	void PrintPiecesSum();
 	bool CheckIsCheck();
 	std::string GetStatus() { return m_status; }
+	std::string GetPiecesPosition();
+	int GetCastlingOptions();
+	Square GetEnPassantSquare(const Square inBase, const Square inDest);
+	int GetHalfmoveClock();
 
 	int m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];

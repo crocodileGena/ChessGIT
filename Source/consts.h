@@ -5,6 +5,15 @@ enum PieceLocation
 	eLetter = 0,
 	eNumber
 };
+
+enum CastlingBitFlag
+{
+	whiteShort,
+	whiteLong,
+	blackShort,
+	blackLong
+};
+
 enum BoardPosition
 {
 	A = 0,

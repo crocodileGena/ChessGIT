@@ -191,8 +191,7 @@ void NotationComponent::paint(Graphics& g)
 
 void NotationComponent::addBoardState()
 {
-	auto lastNode = myBoard->m_gameNotation.GetLastNode();
-	auto moveNumber = lastNode->GetMoveNumber();
+	//TODO: Implement something
 }
 
 void NotationComponent::resized()

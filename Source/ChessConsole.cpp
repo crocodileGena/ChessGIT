@@ -23,7 +23,6 @@ int main()
 	newBoard->PrintBoard();
 
 	// Test Prints
-	newBoard->PrintNotation();
 	newBoard->PrintPiecesSum();
     return 0;
 }

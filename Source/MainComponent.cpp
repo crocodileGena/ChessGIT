@@ -19,7 +19,7 @@ boardStatus(boardGUI.GetBoard())
 	addAndMakeVisible(boardStatus);
 	addAndMakeVisible(gameNotation);
 
-	resetBoard.onClick = [this] { boardGUI.repaint(); };
+	resetBoard.onClick = [this] { boardGUI.repaint(); boardGUI.SetAvtiveSquare({ kIllegalSquare, kIllegalSquare }); };
     setSize (800, 600);
 }
 

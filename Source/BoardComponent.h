@@ -90,6 +90,7 @@ public:
 	void paint(Graphics& g) override;
 	void mouseDown(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
+	void SetAvtiveSquare(juce::Point<int> inSquare) { activeSquare = inSquare; }
 private:
 	Board* myBoard;
 	juce::Point<int> activeSquare;

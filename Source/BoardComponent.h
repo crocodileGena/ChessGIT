@@ -53,17 +53,16 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NextStateComponent)
 };
 
-class BoardStateComponent : public Component
+class BoardStateButton : public TextButton
 {
 public:
-	BoardStateComponent() {}
+	BoardStateButton() {}
 	void paint(Graphics& g) override;
-	Board* GetBoard() { return myBoard; }
 private:
 	Board* myBoard;
 
 	//==============================================================================
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoardStateComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoardStateButton)
 };
 
 class NotationComponent : public Component
@@ -72,12 +71,12 @@ public:
 	NotationComponent(Board* inBoard);
 	void resized() override;
 	void paint(Graphics& g) override;
-	Board* GetBoard() { return myBoard; }
+	void addBoardState();
 private:
 	Board* myBoard;
 	NextStateComponent next;
 	PrevStateComponent prev;
-	OwnedArray<BoardStateComponent> boardStates;
+	OwnedArray<BoardStateButton> boardStates;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NotationComponent)

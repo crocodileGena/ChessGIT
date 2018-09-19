@@ -32,6 +32,7 @@ public:
 
 	void PushMove(const std::string in_Name, const Color in_color, const Square inDest);
 	void PrintNotation();
+	auto GetLastNode() { return m_vNotation.end(); }
 
 private:
 	std::vector<NotationNode> m_vNotation;
@@ -45,6 +46,10 @@ public:
 	~NotationNode() {}
 
 	void UpdateNode(const std::string in_Name, const Square inDest);
+	size_t GetMoveNumber() { return m_moveNumber; }
+	std::string GetWhiteMove() { return m_whiteMove; }
+	std::string GetBlackMove() { return m_blackMove; }
+
 	void Print();
 
 private:

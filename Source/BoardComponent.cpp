@@ -159,11 +159,11 @@ NotationComponent::NotationComponent(Board* inBoard) : myBoard(inBoard)
 	addAndMakeVisible(next);
 	addAndMakeVisible(prev);
 	
-	auto dummyState = new BoardStateComponent;
-	auto dummyState1 = new BoardStateComponent;
-	auto dummyState2 = new BoardStateComponent;
-	auto dummyState3 = new BoardStateComponent;
-	auto dummyState4 = new BoardStateComponent;
+	auto dummyState = new BoardStateButton;
+	auto dummyState1 = new BoardStateButton;
+	auto dummyState2 = new BoardStateButton;
+	auto dummyState3 = new BoardStateButton;
+	auto dummyState4 = new BoardStateButton;
 
 	boardStates.add(dummyState);
 	boardStates.add(dummyState1);
@@ -182,6 +182,12 @@ void NotationComponent::paint(Graphics& g)
 {
 	g.setColour(Colours::white);
 	g.drawRect(getLocalBounds());
+}
+
+void NotationComponent::addBoardState()
+{
+	auto lastNode = myBoard->m_gameNotation.GetLastNode();
+	auto moveNumber = lastNode->GetMoveNumber();
 }
 
 void NotationComponent::resized()
@@ -226,7 +232,7 @@ void NextStateComponent::paint(Graphics& g)
 	//g.fillRect(getLocalBounds());
 }
 
-void BoardStateComponent::paint(Graphics& g)
+void BoardStateButton::paint(Graphics& g)
 {
 	g.setColour(Colours::white);
 	//g.setOpacity(0.5);

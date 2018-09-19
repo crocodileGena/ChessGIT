@@ -91,6 +91,7 @@ public:
 	void mouseDown(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
 	void SetAvtiveSquare(juce::Point<int> inSquare) { activeSquare = inSquare; }
+	void ResetClicked();
 private:
 	Board* myBoard;
 	juce::Point<int> activeSquare;

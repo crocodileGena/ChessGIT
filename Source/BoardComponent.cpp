@@ -10,6 +10,11 @@ BoardComponent::BoardComponent() : activeSquare(kIllegalSquare, kIllegalSquare)
 	LoadImages();
 }
 
+void BoardComponent::ResetClicked()
+{
+	SetAvtiveSquare({ kIllegalSquare, kIllegalSquare });
+	repaint(); 
+}
 void BoardComponent::LoadImages()
 {
 	String workingDir = File::getSpecialLocation(File::hostApplicationPath).getParentDirectory().getFullPathName();

@@ -1,7 +1,7 @@
 //#include "stdafx.h"
 #include "board.h"
 #include <algorithm>
-
+#include <cctype>
 #include "Pieces.h"
 
 void Board::PrintPiecesSum()
@@ -109,7 +109,26 @@ void Board::PrintBoard()
 
 std::string Board::GetPiecesPosition()
 {
-	return ""; //TODO: implement this
+	std::string retVal;
+
+	for (int j = BoardSize - 1; j >= 0; --j)
+		for (int i = 0; i < BoardSize; ++i)
+		{
+			Piece* currPiece = GetPiece({ i, j });
+			if (!currPiece)
+				retVal += "-";
+			else
+			{
+				if (currPiece->m_color == eWhite)
+					retVal += currPiece->m_name;
+				else
+				{
+					auto lower = (char)std::tolower(currPiece->m_name[0]);
+					retVal += lower;
+				}
+			}
+		}
+	return retVal;
 }
 
 int Board::GetCastlingOptions()
@@ -151,7 +170,6 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
 									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 									enPassant, halfmoveClock);
-
 			isPieceMoved = true;
 		}
 

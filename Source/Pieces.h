@@ -24,7 +24,8 @@ public:
 class Pawn : public Piece
 {
 public:
-	Pawn(const Color in_color) : Piece(in_color) { m_worth = Worth::ePawn; }
+	Pawn(const Color in_color) : Piece(in_color) { m_worth = Worth::ePawn; m_name = "P";
+	}
 	~Pawn() {}
 
 	bool MakeMove(Board board, const Square source, const Square dest) override;

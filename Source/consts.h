@@ -1,17 +1,20 @@
 #pragma once
 
+#define kIllegalSquare 8
+
 enum PieceLocation
 {
 	eLetter = 0,
 	eNumber
 };
 
-enum CastlingBitFlag
+enum CastlingFlags
 {
-	whiteShort,
+	whiteShort = 0,
 	whiteLong,
 	blackShort,
-	blackLong
+	blackLong,
+	numCastlingOptions
 };
 
 enum BoardPosition

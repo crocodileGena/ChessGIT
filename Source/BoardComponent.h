@@ -2,8 +2,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "board.h"
 
-#define kIllegalSquare 8
-
 class ResetButton : public TextButton
 {
 public:

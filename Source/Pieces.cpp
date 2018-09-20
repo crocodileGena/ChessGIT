@@ -4,9 +4,9 @@
 
 void RecursiveCheckCaptures(Board board, Square source, int xDirection, int yDirection, std::vector<Piece*>& outCaptures, Color canCaptureColor)
 {
-	Square dest({ source.GetLetter() + xDirection, source.GetNumber() + yDirection });
-	if (dest.GetLetter() > BoardSize - 1 || dest.GetLetter() < 0 ||
-		dest.GetNumber() > BoardSize - 1 || dest.GetNumber() < 0)
+	Square dest({ source.GetFile() + xDirection, source.GetRank() + yDirection });
+	if (dest.GetFile() > BoardSize - 1 || dest.GetFile() < 0 ||
+		dest.GetRank() > BoardSize - 1 || dest.GetRank() < 0)
 		return;
 	Piece* destPiece = board.GetPiece(dest);
 	if (destPiece && destPiece->m_color == canCaptureColor)
@@ -41,29 +41,29 @@ std::vector<Piece*> StraightCaptures(Board board, Square source, Color canCaptur
 
 bool IsDiagonalPath(const Square source, const Square dest)
 {
-	return (source.GetLetter() - dest.GetLetter() == source.GetNumber() - dest.GetNumber() ||
-			source.GetLetter() - dest.GetLetter() == dest.GetNumber() - source.GetNumber());
+	return (source.GetFile() - dest.GetFile() == source.GetRank() - dest.GetRank() ||
+			source.GetFile() - dest.GetFile() == dest.GetRank() - source.GetRank());
 }
 
 bool IsVerticalPath(const Square source, const Square dest)
 {
-	return source.GetLetter() == dest.GetLetter();
+	return source.GetFile() == dest.GetFile();
 }
 
 bool IsHorizontalPath(const Square source, const Square dest)
 {
-	return source.GetNumber() == dest.GetNumber();
+	return source.GetRank() == dest.GetRank();
 }
 
 bool IsVerticalClear(Board board, const Square source, const Square dest)
 {
-	if (source.GetNumber() == dest.GetNumber())
+	if (source.GetRank() == dest.GetRank())
 		return true;
 
-	int verticalPolarity = dest.GetNumber() - source.GetNumber() > 0 ? 1 : -1;
-	Square next(source.GetLetter(), source.GetNumber() + verticalPolarity);
+	int verticalPolarity = dest.GetRank() - source.GetRank() > 0 ? 1 : -1;
+	Square next(source.GetFile(), source.GetRank() + verticalPolarity);
 
-	if (nullptr != board.GetPiece(next) && next.GetNumber() != dest.GetNumber())
+	if (nullptr != board.GetPiece(next) && next.GetRank() != dest.GetRank())
 		return false;
 
 	return IsVerticalClear(board, next, dest);
@@ -71,13 +71,13 @@ bool IsVerticalClear(Board board, const Square source, const Square dest)
 
 bool IsHorizontalClear(Board board, const Square source, const Square dest)
 {
-	if (source.GetLetter() == dest.GetLetter())
+	if (source.GetFile() == dest.GetFile())
 		return true;
 
-	int horizontalPolarity = dest.GetLetter() - source.GetLetter() > 0 ? 1 : -1;
-	Square next(source.GetLetter() + horizontalPolarity, source.GetNumber() );
+	int horizontalPolarity = dest.GetFile() - source.GetFile() > 0 ? 1 : -1;
+	Square next(source.GetFile() + horizontalPolarity, source.GetRank() );
 
-	if (nullptr != board.GetPiece(next) && next.GetNumber() != dest.GetNumber())
+	if (nullptr != board.GetPiece(next) && next.GetRank() != dest.GetRank())
 		return false;
 
 	return IsHorizontalClear(board, next, dest);
@@ -85,14 +85,14 @@ bool IsHorizontalClear(Board board, const Square source, const Square dest)
 
 bool IsDiagonalClear(Board board, const Square source, const Square dest)
 {
-	if (source.GetLetter() == dest.GetLetter()) // we already checked the path is diagonal, hence enough to check only one point
+	if (source.GetFile() == dest.GetFile()) // we already checked the path is diagonal, hence enough to check only one point
 		return true;
 
-	int letterDirectionPolarity = dest.GetLetter() - source.GetLetter() > 0 ? 1 : -1;
-	int numberDirectionPolarity = dest.GetNumber() - source.GetNumber() > 0 ? 1 : -1;
+	int letterDirectionPolarity = dest.GetFile() - source.GetFile() > 0 ? 1 : -1;
+	int numberDirectionPolarity = dest.GetRank() - source.GetRank() > 0 ? 1 : -1;
 
-	Square next(source.GetLetter() + letterDirectionPolarity, source.GetNumber() + numberDirectionPolarity);
-	if (nullptr != board.GetPiece(next) && next.GetNumber() != dest.GetNumber())
+	Square next(source.GetFile() + letterDirectionPolarity, source.GetRank() + numberDirectionPolarity);
+	if (nullptr != board.GetPiece(next) && next.GetRank() != dest.GetRank())
 		return false;
 
 	return IsDiagonalClear(board, next, dest);
@@ -118,36 +118,36 @@ bool Pawn::MakeMove(Board board, const Square source, const Square dest)
 	bool retVal = false;
 	// allow one straight move if not blocked.
 	if ((((Color::eWhite == m_color) &&
-		(dest.GetNumber() == (source.GetNumber() + 1)) &&
+		(dest.GetRank() == (source.GetRank() + 1)) &&
 		(nullptr == board.GetPiece(dest)))
 		|| ((Color::eBlack == m_color) &&
-		(dest.GetNumber() == (source.GetNumber() - 1)) &&
+		(dest.GetRank() == (source.GetRank() - 1)) &&
 			(nullptr == board.GetPiece(dest))))
-		&& source.GetLetter() == dest.GetLetter())
+		&& source.GetFile() == dest.GetFile())
 		retVal = true;
 	// allow capture if piece exists on destination.
 	if (((Color::eWhite == m_color) &&
-		(dest.GetLetter() == (source.GetLetter() + 1) || (dest.GetLetter() == (source.GetLetter() - 1))) &&
-		(dest.GetNumber() == (source.GetNumber() + 1)) &&
+		(dest.GetFile() == (source.GetFile() + 1) || (dest.GetFile() == (source.GetFile() - 1))) &&
+		(dest.GetRank() == (source.GetRank() + 1)) &&
 		(nullptr != board.GetPiece(dest)) &&
 		eBlack == board.GetPiece(dest)->m_color)
 		|| ((Color::eBlack == m_color) &&
-		(dest.GetLetter() == (source.GetLetter() + 1) || (dest.GetLetter() == (source.GetLetter() - 1))) &&
-		(dest.GetNumber() == (source.GetNumber() - 1)) &&
+		(dest.GetFile() == (source.GetFile() + 1) || (dest.GetFile() == (source.GetFile() - 1))) &&
+		(dest.GetRank() == (source.GetRank() - 1)) &&
 		(nullptr != board.GetPiece(dest)) &&
 		eWhite == board.GetPiece(dest)->m_color))
 		retVal = true;
 	// allow two steps from start if not blocked.
 	if ( (Color::eWhite == m_color &&
-		Two == source.GetNumber() &&
-		Four == dest.GetNumber() && 
-		source.GetLetter() == dest.GetLetter() &&
+		Two == source.GetRank() &&
+		Four == dest.GetRank() && 
+		source.GetFile() == dest.GetFile() &&
 		nullptr == board.GetPiece(dest)))
 		retVal = true;
 	else if ( (Color::eBlack == m_color &&
-		Seven == source.GetNumber() && 
-		Five == dest.GetNumber() &&
-		source.GetLetter() == dest.GetLetter() &&
+		Seven == source.GetRank() && 
+		Five == dest.GetRank() &&
+		source.GetFile() == dest.GetFile() &&
 		nullptr == board.GetPiece(dest)) )
 		retVal = true;
 
@@ -176,14 +176,14 @@ bool Knight::MakeMove(Board board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// check the 8 possible knight moves 
-	if ((dest.GetLetter() - source.GetLetter() == 1 && dest.GetNumber() - source.GetNumber() == 2) ||
-		(dest.GetLetter() - source.GetLetter() == 2 && dest.GetNumber() - source.GetNumber() == 1) ||
-		(dest.GetLetter() - source.GetLetter() == 2 && dest.GetNumber() - source.GetNumber() == -1) ||
-		(dest.GetLetter() - source.GetLetter() == 1 && dest.GetNumber() - source.GetNumber() == -2) ||
-		(dest.GetLetter() - source.GetLetter() == -1 && dest.GetNumber() - source.GetNumber() == -2) ||
-		(dest.GetLetter() - source.GetLetter() == -2 && dest.GetNumber() - source.GetNumber() == -1) ||
-		(dest.GetLetter() - source.GetLetter() == -2 && dest.GetNumber() - source.GetNumber() == 1) ||
-		(dest.GetLetter() - source.GetLetter() == -1 && dest.GetNumber() - source.GetNumber() == 2))
+	if ((dest.GetFile() - source.GetFile() == 1 && dest.GetRank() - source.GetRank() == 2) ||
+		(dest.GetFile() - source.GetFile() == 2 && dest.GetRank() - source.GetRank() == 1) ||
+		(dest.GetFile() - source.GetFile() == 2 && dest.GetRank() - source.GetRank() == -1) ||
+		(dest.GetFile() - source.GetFile() == 1 && dest.GetRank() - source.GetRank() == -2) ||
+		(dest.GetFile() - source.GetFile() == -1 && dest.GetRank() - source.GetRank() == -2) ||
+		(dest.GetFile() - source.GetFile() == -2 && dest.GetRank() - source.GetRank() == -1) ||
+		(dest.GetFile() - source.GetFile() == -2 && dest.GetRank() - source.GetRank() == 1) ||
+		(dest.GetFile() - source.GetFile() == -1 && dest.GetRank() - source.GetRank() == 2))
 		retVal = true;
 	// don't allow if same color's is at dest
 	if (nullptr != board.GetPiece(dest) && m_color == board.GetPiece(dest)->m_color)
@@ -230,8 +230,8 @@ bool King::MakeMove(Board board, const Square source, const Square dest)
 	bool retVal = false;
 
 	// check if 1 step away
-	int letterDiff = abs(dest.GetLetter() - source.GetLetter());
-	int numberDiff = abs(dest.GetNumber() - source.GetNumber());
+	int letterDiff = abs(dest.GetFile() - source.GetFile());
+	int numberDiff = abs(dest.GetRank() - source.GetRank());
 	if ( letterDiff <= 1 &&
 		 numberDiff <= 1 &&
 		 letterDiff + numberDiff > 0)
@@ -246,12 +246,12 @@ bool King::MakeMove(Board board, const Square source, const Square dest)
 	if (!retVal && m_bCastleAllowed)
 	{
 		Piece* piece = nullptr;
-		int rookNumber = dest.GetLetter() == G ? H : A;
-		piece = board.GetPiece({ dest.GetLetter(), rookNumber });
+		int rookNumber = dest.GetFile() == G ? H : A;
+		piece = board.GetPiece({ dest.GetFile(), rookNumber });
 		Rook* rook = dynamic_cast<Rook*>(piece);
 		if (rook)
 		{
-			if (rook->m_bCastleAllowed && IsHorizontalClear(board, source, { dest.GetLetter(), rookNumber }))
+			if (rook->m_bCastleAllowed && IsHorizontalClear(board, source, { dest.GetFile(), rookNumber }))
 				retVal = true;
 		}
 	}
@@ -278,13 +278,13 @@ std::vector<Piece*> Pawn::CanPieceCapture(Board board, const Square source)
 
 	if (eWhite == m_color)
 	{
-		leftDestination = { source.GetLetter() - 1, source.GetNumber() + 1 };
-		rightDestination = { source.GetLetter() + 1, source.GetNumber() + 1 };
+		leftDestination = { source.GetFile() - 1, source.GetRank() + 1 };
+		rightDestination = { source.GetFile() + 1, source.GetRank() + 1 };
 	}
 	else
 	{
-		leftDestination = { source.GetLetter() - 1, source.GetNumber() - 1 };
-		rightDestination = { source.GetLetter() + 1, source.GetNumber() - 1 };
+		leftDestination = { source.GetFile() - 1, source.GetRank() - 1 };
+		rightDestination = { source.GetFile() + 1, source.GetRank() - 1 };
 	}
 
 	Piece* leftPiece = board.GetPiece(leftDestination);
@@ -307,14 +307,14 @@ std::vector<Piece*> Bishop::CanPieceCapture(Board board, const Square source)
 std::vector<Piece*> Knight::CanPieceCapture(Board board, const Square source)
 {
 	std::vector<Piece*> retVal;
-	Square square1 = { source.GetLetter() + 1, source.GetNumber() + 2 };
-	Square square2 = { source.GetLetter() + 1, source.GetNumber() - 2 };
-	Square square3 = { source.GetLetter() + 2, source.GetNumber() + 1 };
-	Square square4 = { source.GetLetter() + 2, source.GetNumber() - 1 };
-	Square square5 = { source.GetLetter() - 1, source.GetNumber() + 2 };
-	Square square6 = { source.GetLetter() - 1, source.GetNumber() - 2 };
-	Square square7 = { source.GetLetter() - 2, source.GetNumber() + 1 };
-	Square square8 = { source.GetLetter() - 2, source.GetNumber() - 1 };
+	Square square1 = { source.GetFile() + 1, source.GetRank() + 2 };
+	Square square2 = { source.GetFile() + 1, source.GetRank() - 2 };
+	Square square3 = { source.GetFile() + 2, source.GetRank() + 1 };
+	Square square4 = { source.GetFile() + 2, source.GetRank() - 1 };
+	Square square5 = { source.GetFile() - 1, source.GetRank() + 2 };
+	Square square6 = { source.GetFile() - 1, source.GetRank() - 2 };
+	Square square7 = { source.GetFile() - 2, source.GetRank() + 1 };
+	Square square8 = { source.GetFile() - 2, source.GetRank() - 1 };
 	std::vector<Square> dests;
 	dests.push_back(square1);
 	dests.push_back(square2);

@@ -27,17 +27,27 @@ void Board::PrintPiecesSum()
 		<< blackSum << ". Overall: " << sign
 		<< overall << std::endl;
 }
-Board::Board() : m_lastColorMoved(eBlack), m_status("status bar")
+Board::Board() : 
+m_lastColorMoved(eBlack), 
+m_status("status bar"),
+m_halfmoveClock(0)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			SetPiece({ i,j }, nullptr);
 		}
+
+	for (int i = 0; i < numCastlingOptions; ++i)
+		m_castlingFlag[i] = true;
 }
 void Board::ResetBoard()
 {
 	m_lastColorMoved = eBlack;
+
+	for (int i = 0; i < numCastlingOptions; ++i)
+		m_castlingFlag[i] = true;
+
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
 		{
@@ -131,20 +141,52 @@ std::string Board::GetPiecesPosition()
 	return retVal;
 }
 
-int Board::GetCastlingOptions()
+void Board::UpdateCastlingFlag(const Piece* in_piece, const Square in_origin)
 {
-	return 0; //TODO : implemetn this
+	int piece = in_piece->m_worth;
+	if (piece != eKing || piece != eRook)
+		return;
+	if (in_piece->m_color == eWhite && piece == eKing)
+	{
+		m_castlingFlag[whiteShort] = false;
+		m_castlingFlag[whiteLong] = false;
+	}
+	else if (in_piece->m_color == eWhite && piece == eRook && in_origin.GetFile() == A)
+		m_castlingFlag[whiteLong] = false;
+	else if (in_piece->m_color == eWhite && piece == eRook && in_origin.GetFile() == H)
+		m_castlingFlag[whiteShort] = false;
+	else if (in_piece->m_color == eBlack && piece == eKing)
+	{
+		m_castlingFlag[blackShort] = false;
+		m_castlingFlag[blackLong] = false;
+	}
+	else if (in_piece->m_color == eBlack && piece == eRook && in_origin.GetFile() == A)
+		m_castlingFlag[blackLong] = false;
+	else if (in_piece->m_color == eBlack && piece == eRook && in_origin.GetFile() == H)
+		m_castlingFlag[blackShort] = false;
+
 }
 
 Square Board::GetEnPassantSquare(const Square inBase, const Square inDest)
 {
 	Square retVal;
-	return retVal; //TODO : implement
+	Piece* piece = GetPiece(inBase);
+	if (piece->m_worth == ePawn && piece->m_color == eWhite && inBase.GetRank() == Two &&
+		inDest.GetRank() == Four && inBase.GetFile() == inDest.GetFile())
+		retVal.SetSquare(inDest.GetFile(), inDest.GetRank() - 1);
+	else if (piece->m_worth == ePawn && piece->m_color == eBlack && inBase.GetRank() == Seven &&
+		inDest.GetRank() == Five && inBase.GetFile() == inDest.GetFile())
+		retVal.SetSquare(inDest.GetFile(), inDest.GetRank() + 1);
+
+	return retVal;
 }
 
-int Board::GetHalfmoveClock()
+void Board::UpdateHalfmoveClock(const bool isCapture, const bool isPawn)
 {
-	return 0; // TODO : implement
+	if (isCapture || isPawn)
+		m_halfmoveClock = 0;
+	else
+		++m_halfmoveClock;
 }
 
 void Board::MovePiece(const Square inBase, const Square inDest)
@@ -159,17 +201,18 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 			const bool isCapture = GetPiece(inDest) != nullptr;
 			const bool specifyRank = false; //TODO : Implement this
 			const bool specifyFile = false; //ToDO : Implement this
-			const bool whitesMove = currPiece->m_color == eWhite;
-			const int castlingOptions = GetCastlingOptions();
+			const bool whitesMove = currPiece->m_color == eBlack;
+			const bool* castlingOptions = GetCastlingFlag();
 			const Square enPassant = GetEnPassantSquare(inBase, inDest);
-			const int halfmoveClock = GetHalfmoveClock();
+			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 			SetPiece(inBase, nullptr);
 			SetPiece(inDest, currPiece);
+			UpdateCastlingFlag(currPiece, inBase);
 			currPiece->OnPieceMoved();
 			m_lastColorMoved = currPiece->m_color;
 			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
 									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-									enPassant, halfmoveClock);
+									enPassant, m_halfmoveClock);
 			isPieceMoved = true;
 		}
 
@@ -180,26 +223,106 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 }
 
 std::string GameNotation::GetFENFromPosition(const std::string in_position, const bool whitesMove,
-											const int castlingOptions, const Square enPassant,
+											const bool* castlingOptions, const Square enPassant,
 											const int halfmoveClock)
 {
-	return ""; //TODO: implement this
+	std::string retVal;
+	PositionToString(in_position, retVal);
+	retVal += whitesMove ? " w " : " b ";
+	GetCastlingString(castlingOptions, retVal);
+	retVal += " ";
+	if (enPassant.GetFile() == kIllegalSquare)
+		retVal += '-';
+	else
+	{
+		retVal += char(enPassant.GetFile() + 97);
+		retVal += char(enPassant.GetRank() + 49);
+	}
+	retVal += " ";
+	retVal += std::to_string(halfmoveClock);
+	retVal += " ";
+	int moveNumber = int(double(m_vNotation.size() / 2) + 0.6);
+	retVal += std::to_string(moveNumber);
+	return retVal;
 }
-void GameNotation::PushMove(const std::string in_piecesPosition, const std::string pieceName, 
+
+void GameNotation::GetCastlingString(const bool* in_options, std::string &retVal)
+{
+	bool isNone = true;
+	if (in_options[whiteShort])
+	{
+		retVal += "K";
+		isNone = false;
+	}
+	if (in_options[whiteLong])
+	{
+		retVal += "Q";
+		isNone = false;
+	}
+	if (in_options[blackShort])
+	{
+		retVal += "k";
+		isNone = false;
+	}
+	if (in_options[blackLong])
+	{
+		retVal += "q";
+		isNone = false;
+	}
+	if (isNone)
+		retVal += "-";
+
+}
+void GameNotation::PositionToString(const std::string &in_position, std::string &retVal)
+{
+	int emptyCounter(0);
+	int rawCounter(0);
+	for (char c : in_position)
+	{
+		if (c == '-')
+			++emptyCounter;
+		else
+		{
+			if (emptyCounter != 0)
+			{
+				retVal += std::to_string(emptyCounter);
+				emptyCounter = 0;
+			}
+			retVal += c;
+		}
+
+		if (rawCounter++ == H)
+		{
+			rawCounter = 0;
+			if (emptyCounter != 0)
+			{
+				retVal += std::to_string(emptyCounter);
+				emptyCounter = 0;
+			}
+			retVal += '/';
+		}
+	}
+}
+void GameNotation::PushMove(const std::string &in_piecesPosition, const std::string &pieceName, 
 							const Square in_origin, const Square in_dest, const bool isCapture,
 							const bool specifyRank, const bool specifyFile, const bool whitesMove,
-							const int castlingOptions, const Square enPassant, 
+							const bool* castlingOptions, const Square enPassant, 
 							const int halfmoveClock)
 {
 	std::string fen = GetFENFromPosition(in_piecesPosition, whitesMove, castlingOptions, enPassant, halfmoveClock);
-	std::string algebraic = GetAlgebraic(in_origin, in_dest, isCapture, specifyRank, specifyFile);
+	std::string algebraic = GetAlgebraic(pieceName, in_origin, in_dest, isCapture, specifyRank, specifyFile);
 	NotationNode newNode(algebraic, fen);
 	m_vNotation.push_back(newNode);
 }
 
-std::string GameNotation::GetAlgebraic(const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile)
+std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile)
 {
-	return ""; //TODO: Implement this
+	std::string retVal;
+	retVal += pieceName == "P" ? "" : pieceName;
+	retVal += isCapture ? "x" : "";
+	retVal += char(in_dest.GetFile() + 97);
+	retVal += char(in_dest.GetRank() + 49);
+	return retVal;
 }
 //void GameNotation::PrintNotation()
 //{
@@ -211,10 +334,10 @@ std::string Square::toString() const
 	std::string retString;
 
 	char letter = 'a';
-	letter += (char)m_pos[eLetter];
+	letter += (char)m_file;
 
 	char number = '1';
-	number += (char)m_pos[eNumber];
+	number += (char)m_rank;
 
 	retString += letter;
 	retString += number;
@@ -245,9 +368,9 @@ bool Board::CheckIsCheck()
 
 Piece* Board::GetPiece(const Square inLocation)
 {
-	if (inLocation.GetLetter() < A || inLocation.GetLetter() > H ||
-		inLocation.GetNumber() < One || inLocation.GetNumber() > Eight)
+	if (inLocation.GetFile() < A || inLocation.GetFile() > H ||
+		inLocation.GetRank() < One || inLocation.GetRank() > Eight)
 		return nullptr;
 		
-	return board[inLocation.GetLetter()][inLocation.GetNumber()];
+	return board[inLocation.GetFile()][inLocation.GetRank()];
 }

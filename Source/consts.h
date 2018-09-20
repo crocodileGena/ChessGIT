@@ -4,8 +4,8 @@
 
 enum PieceLocation
 {
-	eLetter = 0,
-	eNumber
+	eFile = 0,
+	eRank
 };
 
 enum CastlingFlags

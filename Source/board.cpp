@@ -235,8 +235,8 @@ std::string GameNotation::GetFENFromPosition(const std::string in_position, cons
 		retVal += '-';
 	else
 	{
-		retVal += char(enPassant.GetFile() + 97);
-		retVal += char(enPassant.GetRank() + 49);
+		retVal += char(enPassant.GetFile() + 'a');
+		retVal += char(enPassant.GetRank() + '1');
 	}
 	retVal += " ";
 	retVal += std::to_string(halfmoveClock);
@@ -320,8 +320,8 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 	std::string retVal;
 	retVal += pieceName == "P" ? "" : pieceName;
 	retVal += isCapture ? "x" : "";
-	retVal += char(in_dest.GetFile() + 97);
-	retVal += char(in_dest.GetRank() + 49);
+	retVal += char(in_dest.GetFile() + 'a');
+	retVal += char(in_dest.GetRank() + '1');
 	return retVal;
 }
 //void GameNotation::PrintNotation()
@@ -333,14 +333,14 @@ std::string Square::toString() const
 {
 	std::string retString;
 
-	char letter = 'a';
-	letter += (char)m_file;
+	char file = 'a';
+	file += (char)m_file;
 
-	char number = '1';
-	number += (char)m_rank;
+	char rank = '1';
+	rank += (char)m_rank;
 
-	retString += letter;
-	retString += number;
+	retString += file;
+	retString += rank;
 
 	return retString;
 }

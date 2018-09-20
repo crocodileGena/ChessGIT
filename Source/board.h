@@ -12,8 +12,8 @@ class Square
 {
 public:
 	Square() : m_rank(kIllegalSquare), m_file(kIllegalSquare) {}
-	Square(const int inPos[2]) { m_file = inPos[0]; m_rank = inPos[1]; }
-	Square(const int letter, const int number) { m_file = letter; m_rank = number; }
+	Square(const int input[2]) { m_file = input[eFile]; m_rank = input[eRank]; }
+	Square(const int file, const int rank) { m_file = file; m_rank = rank; }
 	~Square() {}
 
 	bool operator==(const Square &other) { return (m_file == other.m_file && m_rank == other.m_rank); }

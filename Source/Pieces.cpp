@@ -88,10 +88,10 @@ bool IsDiagonalClear(Board board, const Square source, const Square dest)
 	if (source.GetFile() == dest.GetFile()) // we already checked the path is diagonal, hence enough to check only one point
 		return true;
 
-	int letterDirectionPolarity = dest.GetFile() - source.GetFile() > 0 ? 1 : -1;
-	int numberDirectionPolarity = dest.GetRank() - source.GetRank() > 0 ? 1 : -1;
+	int fileDirectionPolarity = dest.GetFile() - source.GetFile() > 0 ? 1 : -1;
+	int rankDirectionPolarity = dest.GetRank() - source.GetRank() > 0 ? 1 : -1;
 
-	Square next(source.GetFile() + letterDirectionPolarity, source.GetRank() + numberDirectionPolarity);
+	Square next(source.GetFile() + fileDirectionPolarity, source.GetRank() + rankDirectionPolarity);
 	if (nullptr != board.GetPiece(next) && next.GetRank() != dest.GetRank())
 		return false;
 
@@ -230,11 +230,11 @@ bool King::MakeMove(Board board, const Square source, const Square dest)
 	bool retVal = false;
 
 	// check if 1 step away
-	int letterDiff = abs(dest.GetFile() - source.GetFile());
-	int numberDiff = abs(dest.GetRank() - source.GetRank());
-	if ( letterDiff <= 1 &&
-		 numberDiff <= 1 &&
-		 letterDiff + numberDiff > 0)
+	int fileDiff = abs(dest.GetFile() - source.GetFile());
+	int rankDiff = abs(dest.GetRank() - source.GetRank());
+	if ( fileDiff <= 1 &&
+		 rankDiff <= 1 &&
+		 fileDiff + rankDiff > 0)
 		retVal = true;
 
 	// check if dest is vacant or oponent
@@ -246,12 +246,12 @@ bool King::MakeMove(Board board, const Square source, const Square dest)
 	if (!retVal && m_bCastleAllowed)
 	{
 		Piece* piece = nullptr;
-		int rookNumber = dest.GetFile() == G ? H : A;
-		piece = board.GetPiece({ dest.GetFile(), rookNumber });
+		int rookFile = dest.GetFile() == G ? H : A;
+		piece = board.GetPiece({ rookFile, dest.GetRank() });
 		Rook* rook = dynamic_cast<Rook*>(piece);
 		if (rook)
 		{
-			if (rook->m_bCastleAllowed && IsHorizontalClear(board, source, { dest.GetFile(), rookNumber }))
+			if (rook->m_bCastleAllowed && IsHorizontalClear(board, source, { rookFile, dest.GetRank() }))
 				retVal = true;
 		}
 	}

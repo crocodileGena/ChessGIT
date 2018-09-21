@@ -47,10 +47,10 @@ knightButton("knightSelection")
 	addAndMakeVisible(knightButton);
 
 
-	rookButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "R"); repaint(); setVisible(false);  };
-	queenButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "Q"); setVisible(false); };
-	bishopButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "B"); setVisible(false); };
-	knightButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "N"); setVisible(false); };
+	rookButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "R"); setVisible(false); getParentComponent()->repaint(); };
+	queenButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "Q"); setVisible(false); getParentComponent()->repaint(); };
+	bishopButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "B"); setVisible(false); getParentComponent()->repaint(); };
+	knightButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "N"); setVisible(false); getParentComponent()->repaint(); };
 }
 
 void QueeningComponent::resized()

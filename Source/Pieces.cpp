@@ -2,7 +2,7 @@
 #include "Pieces.h"
 #include <stdlib.h>
 
-void RecursiveCheckCaptures(Board board, Square source, int xDirection, int yDirection, std::vector<Piece*>& outCaptures, Color canCaptureColor)
+void RecursiveCheckCaptures(Board &board, Square source, int xDirection, int yDirection, std::vector<Piece*>& outCaptures, Color canCaptureColor)
 {
 	Square dest({ source.GetFile() + xDirection, source.GetRank() + yDirection });
 	if (dest.GetFile() > BoardSize - 1 || dest.GetFile() < 0 ||
@@ -19,7 +19,7 @@ void RecursiveCheckCaptures(Board board, Square source, int xDirection, int yDir
 	
 }
 
-std::vector<Piece*> DiagonalsCaptures(Board board, Square source, Color canCaptureColor)
+std::vector<Piece*> DiagonalsCaptures(Board &board, Square source, Color canCaptureColor)
 {
 	std::vector<Piece*> retVal;
 	RecursiveCheckCaptures(board, source, 1, 1, retVal, canCaptureColor);
@@ -29,7 +29,7 @@ std::vector<Piece*> DiagonalsCaptures(Board board, Square source, Color canCaptu
 	return retVal;
 }
 
-std::vector<Piece*> StraightCaptures(Board board, Square source, Color canCaptureColor)
+std::vector<Piece*> StraightCaptures(Board &board, Square source, Color canCaptureColor)
 {
 	std::vector<Piece*> retVal;
 	RecursiveCheckCaptures(board, source, 1, 0, retVal, canCaptureColor);
@@ -55,7 +55,7 @@ bool IsHorizontalPath(const Square source, const Square dest)
 	return source.GetRank() == dest.GetRank();
 }
 
-bool IsVerticalClear(Board board, const Square source, const Square dest)
+bool IsVerticalClear(Board &board, const Square source, const Square dest)
 {
 	if (source.GetRank() == dest.GetRank())
 		return true;
@@ -69,7 +69,7 @@ bool IsVerticalClear(Board board, const Square source, const Square dest)
 	return IsVerticalClear(board, next, dest);
 }
 
-bool IsHorizontalClear(Board board, const Square source, const Square dest)
+bool IsHorizontalClear(Board &board, const Square source, const Square dest)
 {
 	if (source.GetFile() == dest.GetFile())
 		return true;
@@ -83,7 +83,7 @@ bool IsHorizontalClear(Board board, const Square source, const Square dest)
 	return IsHorizontalClear(board, next, dest);
 }
 
-bool IsDiagonalClear(Board board, const Square source, const Square dest)
+bool IsDiagonalClear(Board &board, const Square source, const Square dest)
 {
 	if (source.GetFile() == dest.GetFile()) // we already checked the path is diagonal, hence enough to check only one point
 		return true;
@@ -98,7 +98,7 @@ bool IsDiagonalClear(Board board, const Square source, const Square dest)
 	return IsDiagonalClear(board, next, dest);
 }
 
-bool ArePiecesInWay(Board board, const Square source, const Square dest)
+bool ArePiecesInWay(Board &board, const Square source, const Square dest)
 {
 	bool retVal = true;
 	if (IsDiagonalPath(source, dest))
@@ -113,7 +113,7 @@ bool ArePiecesInWay(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Pawn::MakeMove(Board board, const Square source, const Square dest)
+bool Pawn::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// allow one straight move if not blocked.
@@ -157,7 +157,7 @@ bool Pawn::MakeMove(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Bishop::MakeMove(Board board, const Square source, const Square dest)
+bool Bishop::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// allow only if on diagonal and no pieces are in the way and if dest if vacant or oponent's piece
@@ -175,7 +175,7 @@ bool Bishop::MakeMove(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Knight::MakeMove(Board board, const Square source, const Square dest)
+bool Knight::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// check the 8 possible knight moves 
@@ -195,7 +195,7 @@ bool Knight::MakeMove(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Rook::MakeMove(Board board, const Square source, const Square dest)
+bool Rook::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// Check if straight path
@@ -211,7 +211,7 @@ bool Rook::MakeMove(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Queen::MakeMove(Board board, const Square source, const Square dest)
+bool Queen::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// Check if straight or diagonal path
@@ -228,7 +228,7 @@ bool Queen::MakeMove(Board board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool King::MakeMove(Board board, const Square source, const Square dest)
+bool King::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 
@@ -273,7 +273,7 @@ void Rook::OnPieceMoved()
 	m_bCastleAllowed = false;
 }
 
-std::vector<Piece*> Pawn::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> Pawn::CanPieceCapture(Board &board, const Square source)
 {
 	Square leftDestination;
 	Square rightDestination;
@@ -301,13 +301,13 @@ std::vector<Piece*> Pawn::CanPieceCapture(Board board, const Square source)
 	return retVal;
 }
 
-std::vector<Piece*> Bishop::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> Bishop::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal = DiagonalsCaptures(board, source, m_color? eWhite : eBlack);
 	return retVal;
 }
 
-std::vector<Piece*> Knight::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> Knight::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal;
 	Square square1 = { source.GetFile() + 1, source.GetRank() + 2 };
@@ -338,13 +338,13 @@ std::vector<Piece*> Knight::CanPieceCapture(Board board, const Square source)
 	return retVal;
 }
 
-std::vector<Piece*> Rook::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> Rook::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal = StraightCaptures(board, source, m_color ? eWhite : eBlack);
 	return retVal;
 }
 
-std::vector<Piece*> Queen::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> Queen::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal = StraightCaptures(board, source, m_color ? eWhite : eBlack);
 	std::vector<Piece*> retVal2 = DiagonalsCaptures(board, source, m_color ? eWhite : eBlack);
@@ -354,7 +354,7 @@ std::vector<Piece*> Queen::CanPieceCapture(Board board, const Square source)
 	return retVal;
 }
 
-std::vector<Piece*> King::CanPieceCapture(Board board, const Square source)
+std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal;
 	return retVal;

@@ -2,10 +2,76 @@
 #include "Pieces.h"
 
 int drawOffset = 18;
-BoardComponent::BoardComponent() : activeSquare(kIllegalSquare, kIllegalSquare)
+
+void QueeningComponent::paint(Graphics& g)
 {
+	g.drawImageAt(backgroundImage, 0, 0);
+}
+
+QueeningComponent::QueeningComponent(const bool in_isWhite) :
+isWhite(in_isWhite),
+rookButton("rookSelection"),
+queenButton("queenSelection"),
+bishopButton("bishopSelection"),
+knightButton("knightSelection")
+{
+	juce::String colorLetter = in_isWhite ? "w" : "b";
+	String workingDir = File::getSpecialLocation(File::hostApplicationPath).getParentDirectory().getFullPathName();
+	String separator = File::getSeparatorString();
+	workingDir += separator + "Images" + separator;
+
+	File f(workingDir + "QueeningBackground.png");
+	backgroundImage = ImageFileFormat::loadFrom(f);
+
+	File rookFile(workingDir + colorLetter + "Rook.png");
+	rookImage = ImageFileFormat::loadFrom(rookFile);
+	File queenFile(workingDir + colorLetter + "Queen.png");
+	queenImage = ImageFileFormat::loadFrom(queenFile);
+	File bishopFile(workingDir + colorLetter + "Bishop.png");
+	bishopImage = ImageFileFormat::loadFrom(bishopFile);
+	File knightFile(workingDir + colorLetter + "Knight.png");
+	knightImage = ImageFileFormat::loadFrom(knightFile);
+
+	rookButton.setImages(true, false, true, rookImage, 0.8, Colours::transparentBlack, rookImage,
+		1.0, Colours::transparentBlack, rookImage, 0.8, Colours::transparentBlack);
+	queenButton.setImages(true, false, true, queenImage, 0.8, Colours::transparentBlack, queenImage,
+		1.0, Colours::transparentBlack, queenImage, 0.8, Colours::transparentBlack);
+	bishopButton.setImages(true, false, true, bishopImage, 0.8, Colours::transparentBlack, bishopImage,
+		1.0, Colours::transparentBlack, bishopImage, 0.8, Colours::transparentBlack);
+	knightButton.setImages(true, false, true, knightImage, 0.8, Colours::transparentBlack, knightImage,
+		1.0, Colours::transparentBlack, knightImage, 0.8, Colours::transparentBlack);
+
+	addAndMakeVisible(rookButton);
+	addAndMakeVisible(queenButton);
+	addAndMakeVisible(bishopButton);
+	addAndMakeVisible(knightButton);
+}
+
+void QueeningComponent::resized()
+{
+	rookButton.setBounds(5, 5, 60, 60);
+	queenButton.setBounds(65, 5, 60, 60);
+	bishopButton.setBounds(125, 5, 60, 60);
+	knightButton.setBounds(185, 5, 60, 60);
+}
+
+void BoardComponent::resized()
+{
+	whiteQueeningComponent.setBounds(133, 222, 250, 70);
+	blackQueeningComponent.setBounds(133, 222, 250, 70);
+}
+BoardComponent::BoardComponent() : 
+activeSquare(kIllegalSquare, kIllegalSquare),
+queeningSquare(kIllegalSquare, kIllegalSquare),
+blackQueeningComponent(false),
+whiteQueeningComponent(true)
+{
+	addChildComponent(whiteQueeningComponent);
+	addChildComponent(blackQueeningComponent);
 	myBoard = new Board;
 	myBoard->ResetBoard();
+	blackQueeningComponent.SetBoard(myBoard);
+	whiteQueeningComponent.SetBoard(myBoard);
 
 	LoadImages();
 }
@@ -111,6 +177,14 @@ void BoardComponent::paint(Graphics& g)
 			else
 				imageToDraw = nullptr;
 		}
+
+	if (queeningSquare.GetFile() != kIllegalSquare)
+	{
+		if (queeningSquare.GetRank() == Eight)
+			whiteQueeningComponent.setVisible(true);
+		else
+			blackQueeningComponent.setVisible(true);
+	}
 }
 
 void BoardComponent::mouseDown(const MouseEvent &event)
@@ -125,15 +199,23 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		|| destX > 7 || destX < 0 || destY > 7 || destY < 0)
 		destX = kIllegalSquare;
 
-	activeSquare.setX(destX);
-	activeSquare.setY(destY);
 	Square dest({ destX, 7 -destY });
+	if (!myBoard->GetQueeningMode())
+	{
+		activeSquare.setX(destX);
+		activeSquare.setY(destY);
 
-	if (origin == dest)
-		activeSquare.setX(kIllegalSquare);
+		if (origin == dest)
+			activeSquare.setX(kIllegalSquare);
+	}
 
 	if (kIllegalSquare != activeSquare.getX())
 		myBoard->MovePiece(origin, dest);
+
+	if (myBoard->GetQueeningMode())
+	{
+		queeningSquare = dest;
+	}
 
 	repaint();
 }

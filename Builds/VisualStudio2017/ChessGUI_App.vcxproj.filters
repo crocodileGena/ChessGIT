@@ -2874,4 +2874,9 @@
       <Filter>ChessGUI\Resources</Filter>
     </CopyFileToFolders>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Images\QueeningBackground.png">
+      <Filter>ChessGUI\Resources</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

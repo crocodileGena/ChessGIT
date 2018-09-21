@@ -13,8 +13,8 @@ public:
 	~Piece() {}
 
 	virtual void OnPieceMoved() {};
-	virtual bool MakeMove(Board board, const Square source, const Square dest) = 0;
-	virtual std::vector<Piece*> CanPieceCapture(Board board, const Square source) = 0;
+	virtual bool MakeMove(Board &board, const Square source, const Square dest) = 0;
+	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
 
 	int m_worth;
 	Color m_color;
@@ -28,8 +28,8 @@ public:
 	}
 	~Pawn() {}
 
-	bool MakeMove(Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 };
 
 class Bishop : public Piece
@@ -38,8 +38,8 @@ public:
 	Bishop(const Color in_color) : Piece(in_color) { m_worth = Worth::eBishop; m_name = "B"; }
 	~Bishop() {}
 
-	bool MakeMove(Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 };
 
 class Knight : public Piece
@@ -49,8 +49,8 @@ public:
 	}
 	~Knight() {}
 
-	bool MakeMove(Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 };
 
 class Rook : public Piece
@@ -61,8 +61,8 @@ public:
 	~Rook() {}
 
 	void OnPieceMoved() override;
-	bool MakeMove(Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 
 	bool m_bCastleAllowed;
 };
@@ -74,8 +74,8 @@ public:
 	}
 	~Queen() {}
 
-	bool MakeMove(const Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 };
 
 class King : public Piece
@@ -86,8 +86,8 @@ public:
 	~King() {}
 
 	void OnPieceMoved() override;
-	bool MakeMove(Board board, const Square source, const Square dest) override;
-	std::vector<Piece*> CanPieceCapture(Board board, const Square source) override;
+	bool MakeMove(Board &board, const Square source, const Square dest) override;
+	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 
 	bool m_bCastleAllowed;
 };

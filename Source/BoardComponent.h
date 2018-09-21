@@ -80,12 +80,36 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NotationComponent)
 };
 
+class QueeningComponent : public Component
+{
+public:
+	QueeningComponent(const bool isWhite);
+	void resized() override;
+	void paint(Graphics& g) override;
+	void SetBoard(Board* in_board) { myBoard = in_board; }
+
+private:
+	Board* myBoard;
+	bool isWhite;
+	Image backgroundImage;
+	Image rookImage;
+	Image queenImage;
+	Image bishopImage;
+	Image knightImage;
+	ImageButton rookButton;
+	ImageButton queenButton;
+	ImageButton bishopButton;
+	ImageButton knightButton;
+
+};
+
 class BoardComponent : public Component
 {
 public:
 	BoardComponent();
 	void LoadImages();
 	void paint(Graphics& g) override;
+	void resized() override;
 	void mouseDown(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
 	void SetAvtiveSquare(juce::Point<int> inSquare) { activeSquare = inSquare; }
@@ -93,6 +117,9 @@ public:
 private:
 	Board* myBoard;
 	juce::Point<int> activeSquare;
+	Square queeningSquare;
+	QueeningComponent whiteQueeningComponent;
+	QueeningComponent blackQueeningComponent;
 
 	Image background;
 	Image activeSquareImage;

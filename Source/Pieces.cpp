@@ -151,6 +151,9 @@ bool Pawn::MakeMove(Board board, const Square source, const Square dest)
 		nullptr == board.GetPiece(dest)) )
 		retVal = true;
 
+	if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
+		board.SetQueeningMode(true);
+
 	return retVal;
 }
 

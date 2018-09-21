@@ -30,7 +30,8 @@ void Board::PrintPiecesSum()
 Board::Board() : 
 m_lastColorMoved(eBlack), 
 m_status("status bar"),
-m_halfmoveClock(0)
+m_halfmoveClock(0),
+m_queeningMode(false)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -44,6 +45,9 @@ m_halfmoveClock(0)
 void Board::ResetBoard()
 {
 	m_lastColorMoved = eBlack;
+	m_queeningMode = false;
+	m_status = "status bar";
+	m_halfmoveClock = 0;
 
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;
@@ -189,11 +193,30 @@ void Board::UpdateHalfmoveClock(const bool isCapture, const bool isPawn)
 		++m_halfmoveClock;
 }
 
+void Board::QueenAPawn(const Square in_square, const std::string in_piece)
+{
+	if (!GetQueeningMode())
+		return;
+	SetQueeningMode(false);
+
+	Piece* newPiece(nullptr);
+	if (in_piece == "R")
+		newPiece = new Rook(in_square.GetRank() == Eight ? eWhite : eBlack);
+	else if (in_piece == "Q")
+		newPiece = new Queen(in_square.GetRank() == Eight ? eWhite : eBlack);
+	else if (in_piece == "B")
+		newPiece = new Bishop(in_square.GetRank() == Eight ? eWhite : eBlack);
+	else if (in_piece == "N")
+		newPiece = new Knight(in_square.GetRank() == Eight ? eWhite : eBlack);
+
+	board[in_square.GetFile()][in_square.GetRank()] = newPiece;
+}
+
 void Board::MovePiece(const Square inBase, const Square inDest)
 {
 	bool isPieceMoved = false;
 	auto currPiece = GetPiece(inBase);
-	if (currPiece)
+	if (!GetQueeningMode() && currPiece)
 		if (m_lastColorMoved == currPiece->m_color)
 			std::cout << "Same color ";
 		else if (currPiece->MakeMove(*this, inBase, inDest))

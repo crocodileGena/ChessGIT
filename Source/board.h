@@ -84,6 +84,9 @@ public:
 	bool* GetCastlingFlag() { return m_castlingFlag; }
 	Square GetEnPassantSquare(const Square inBase, const Square inDest);
 	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
+	bool GetQueeningMode() { return m_queeningMode; }
+	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
+	void QueenAPawn(const Square in_square, const std::string in_piece);
 
 	int m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];
@@ -91,5 +94,6 @@ public:
 	std::string m_status;
 	bool m_castlingFlag[numCastlingOptions];
 	int m_halfmoveClock;
+	bool m_queeningMode;
 
 };

@@ -87,9 +87,11 @@ public:
 	void resized() override;
 	void paint(Graphics& g) override;
 	void SetBoard(Board* in_board) { myBoard = in_board; }
+	void SetQueeningSquare(const Square in_square) { queeningSquare = in_square; }
 
 private:
 	Board* myBoard;
+	Square queeningSquare;
 	bool isWhite;
 	Image backgroundImage;
 	Image rookImage;

@@ -45,6 +45,12 @@ knightButton("knightSelection")
 	addAndMakeVisible(queenButton);
 	addAndMakeVisible(bishopButton);
 	addAndMakeVisible(knightButton);
+
+
+	rookButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "R"); repaint(); setVisible(false);  };
+	queenButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "Q"); setVisible(false); };
+	bishopButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "B"); setVisible(false); };
+	knightButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "N"); setVisible(false); };
 }
 
 void QueeningComponent::resized()
@@ -72,7 +78,6 @@ whiteQueeningComponent(true)
 	myBoard->ResetBoard();
 	blackQueeningComponent.SetBoard(myBoard);
 	whiteQueeningComponent.SetBoard(myBoard);
-
 	LoadImages();
 }
 
@@ -178,7 +183,7 @@ void BoardComponent::paint(Graphics& g)
 				imageToDraw = nullptr;
 		}
 
-	if (queeningSquare.GetFile() != kIllegalSquare)
+	if (myBoard->GetQueeningMode())
 	{
 		if (queeningSquare.GetRank() == Eight)
 			whiteQueeningComponent.setVisible(true);
@@ -214,6 +219,10 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 
 	if (myBoard->GetQueeningMode())
 	{
+		if (dest.GetRank() == Eight)
+			whiteQueeningComponent.SetQueeningSquare(dest);
+		else
+			blackQueeningComponent.SetQueeningSquare(dest);
 		queeningSquare = dest;
 	}
 

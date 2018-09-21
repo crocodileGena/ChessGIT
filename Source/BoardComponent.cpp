@@ -1,5 +1,6 @@
 #include "BoardComponent.h"
 #include "Pieces.h"
+#include "MainComponent.h"
 
 int drawOffset = 18;
 
@@ -214,8 +215,19 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 			activeSquare.setX(kIllegalSquare);
 	}
 
+	bool pieceMoved = false;
 	if (kIllegalSquare != activeSquare.getX())
-		myBoard->MovePiece(origin, dest);
+		pieceMoved = myBoard->MovePiece(origin, dest);
+
+	if (pieceMoved)
+	{
+		// get notation from board
+		auto newNode = myBoard->m_gameNotation.GetLastNode();
+		// pass it to GUI Notation
+		MainComponent *parentComponent = dynamic_cast<MainComponent*>(getParentComponent());
+		NotationComponent *gameNotationComponent = parentComponent->GetGameNotation();
+		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
+	}
 
 	if (myBoard->GetQueeningMode())
 	{
@@ -250,28 +262,17 @@ void StatusComponent::paint(Graphics& g)
 	g.drawText(currStatus, getLocalBounds(), Justification::centred, true);
 }
 
-NotationComponent::NotationComponent(Board* inBoard) : myBoard(inBoard)
+NotationComponent::NotationComponent(Board* inBoard) : 
+myBoard(inBoard),
+start("Start"),
+next("Next"),
+prev("Prev"),
+end("End")
 {
 	addAndMakeVisible(next);
 	addAndMakeVisible(prev);
-	
-	auto dummyState = new BoardStateButton;
-	auto dummyState1 = new BoardStateButton;
-	auto dummyState2 = new BoardStateButton;
-	auto dummyState3 = new BoardStateButton;
-	auto dummyState4 = new BoardStateButton;
-
-	boardStates.add(dummyState);
-	boardStates.add(dummyState1);
-	boardStates.add(dummyState2);
-	boardStates.add(dummyState3);
-	boardStates.add(dummyState4);
-	addAndMakeVisible(*dummyState);
-	addAndMakeVisible(*dummyState1);
-	addAndMakeVisible(*dummyState2);
-	addAndMakeVisible(*dummyState3);
-	addAndMakeVisible(*dummyState4);
-
+	addAndMakeVisible(start);
+	addAndMakeVisible(end);
 }
 
 void NotationComponent::paint(Graphics& g)
@@ -280,23 +281,31 @@ void NotationComponent::paint(Graphics& g)
 	g.drawRect(getLocalBounds());
 }
 
-void NotationComponent::addBoardState()
+void NotationComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
-	//TODO: Implement something
+	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic);
+	boardStates.add(newState);
+	setColour(3, Colours::white);
+	addAndMakeVisible(*newState);
+	resized();
 }
 
 void NotationComponent::resized()
 {
 	auto componentBounds(getLocalBounds());
-	int buttonSize(30);
+	int buttonSize(44);
 	int spacing(5);
-	Rectangle<int> currRect(spacing, componentBounds.getBottom() - buttonSize - spacing, buttonSize, buttonSize);
+	Rectangle<int> currRect(spacing, componentBounds.getBottom() - buttonSize - spacing, buttonSize, 20);
+	start.setBounds(currRect);
+	currRect.setX(currRect.getRight() + spacing);
 	prev.setBounds(currRect);
 	currRect.setX(currRect.getRight() + spacing);
 	next.setBounds(currRect);
+	currRect.setX(currRect.getRight() + spacing);
+	end.setBounds(currRect);
 
-	int xWhite(10);
-	int xBlack(100);
+	int xWhite(20);
+	int xBlack(130);
 	int yPos(10);
 	int xPos(xWhite);
 	int moveNumber(1);
@@ -317,30 +326,11 @@ void NotationComponent::resized()
 	}
 }
 
-void NextStateComponent::paint(Graphics& g)
-{
-	g.setColour(Colours::white);
-	//g.setOpacity(0.5);
-	g.fillRect(getLocalBounds());
-	g.setColour(Colours::black);
-	g.drawText("next", getLocalBounds(), Justification::centred, true);
-	//g.fillRect(getLocalBounds());
-}
-
 void BoardStateButton::paint(Graphics& g)
 {
-	g.setColour(Colours::white);
-	//g.setOpacity(0.5);
-	g.fillRect(getLocalBounds());
-	g.setColour(Colours::black);
-	g.drawText("boardState1", getLocalBounds(), Justification::centred, true);
+	TextButton::paint(g);
+	//g.setColour(Colours::grey);
 	//g.fillRect(getLocalBounds());
-}
-
-void PrevStateComponent::paint(Graphics& g)
-{
-	g.setColour(Colours::white);
-	g.fillRect(getLocalBounds());
-	g.setColour(Colours::black);
-	g.drawText("prev", getLocalBounds(), Justification::centred, true);
+	g.setColour(Colours::grey);
+	g.drawText(getName(), getLocalBounds(), Justification::centred, true);
 }

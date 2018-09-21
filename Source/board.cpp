@@ -212,7 +212,7 @@ void Board::QueenAPawn(const Square in_square, const std::string in_piece)
 	board[in_square.GetFile()][in_square.GetRank()] = newPiece;
 }
 
-void Board::MovePiece(const Square inBase, const Square inDest)
+bool Board::MovePiece(const Square inBase, const Square inDest)
 {
 	bool isPieceMoved = false;
 	auto currPiece = GetPiece(inBase);
@@ -243,6 +243,8 @@ void Board::MovePiece(const Square inBase, const Square inDest)
 		std::cout << "Illegal Move\n";
 	else
 		CheckIsCheck();
+
+	return isPieceMoved;
 }
 
 std::string GameNotation::GetFENFromPosition(const std::string in_position, const bool whitesMove,

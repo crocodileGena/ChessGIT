@@ -1500,9 +1500,6 @@
     <ClCompile Include="..\..\Source\board.cpp">
       <Filter>ChessGUI\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ChessConsole.cpp">
-      <Filter>ChessGUI\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Pieces.cpp">
       <Filter>ChessGUI\Source</Filter>
     </ClCompile>
@@ -2873,10 +2870,6 @@
     <CopyFileToFolders Include="..\..\Images\wBishop.png">
       <Filter>ChessGUI\Resources</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\Images\QueeningBackground.png">
-      <Filter>ChessGUI\Resources</Filter>
-    </Image>
+    <CopyFileToFolders Include="..\..\Images\QueeningBackground.png" />
   </ItemGroup>
 </Project>

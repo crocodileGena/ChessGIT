@@ -155,7 +155,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\Source\board.cpp" />
     <ClCompile Include="..\..\Source\BoardComponent.cpp" />
-    <ClCompile Include="..\..\Source\ChessConsole.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\..\..\Downloads\juce-5.3.2-windows\JUCE\modules\juce_core\containers\juce_AbstractFifo.cpp">

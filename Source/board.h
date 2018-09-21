@@ -28,28 +28,6 @@ private:
 	int m_file;
 };
 
-class GameNotation
-{
-public:
-	GameNotation() {}
-	~GameNotation() { m_vNotation.clear(); }
-
-	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
-		Square in_origin, const Square in_dest, const bool isCapture,
-		const bool specifyRank, const bool specifyFile, const bool whitesMove, 
-		const bool* castlingOptions, const Square enPassant, const int halfmoveClock);
-	std::string GetFENFromPosition(const std::string in_position, const bool whitesMove,
-									const bool* castlingOptions, const Square enPassant,
-									const int halfmoveClock);
-	void PositionToString(const std::string &in_position, std::string &retVal);
-	void GetCastlingString(const bool* in_options, std::string &retVal);
-	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile);
-
-private:
-	std::vector<NotationNode> m_vNotation;
-
-};
-
 class NotationNode
 {
 public:
@@ -65,6 +43,30 @@ private:
 	std::string m_fen;			//state
 };
 
+class GameNotation
+{
+public:
+	GameNotation() {}
+	~GameNotation() { m_vNotation.clear(); }
+
+	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
+		Square in_origin, const Square in_dest, const bool isCapture,
+		const bool specifyRank, const bool specifyFile, const bool whitesMove,
+		const bool* castlingOptions, const Square enPassant, const int halfmoveClock);
+	NotationNode GetLastNode() { return m_vNotation.back(); }
+
+private:
+	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile);
+	std::string GetFENFromPosition(const std::string in_position, const bool whitesMove,
+		const bool* castlingOptions, const Square enPassant,
+		const int halfmoveClock);
+	void PositionToString(const std::string &in_position, std::string &retVal);
+	void GetCastlingString(const bool* in_options, std::string &retVal);
+
+	std::vector<NotationNode> m_vNotation;
+
+};
+
 class Board
 {
 public:
@@ -73,7 +75,7 @@ public:
 
 	void PrintBoard();
 	void ResetBoard();
-	void MovePiece(const Square inBase, const Square inDest);
+	bool MovePiece(const Square inBase, const Square inDest);
 	Piece* GetPiece(const Square inLocation);
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
 	void PrintPiecesSum();
@@ -95,5 +97,4 @@ public:
 	bool m_castlingFlag[numCastlingOptions];
 	int m_halfmoveClock;
 	bool m_queeningMode;
-
 };

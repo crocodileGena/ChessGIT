@@ -25,40 +25,17 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StatusComponent)
 };
 
-class PrevStateComponent : public Component
-{
-public:
-	PrevStateComponent() {}
-	void paint(Graphics& g) override;
-	Board* GetBoard() { return myBoard; }
-private:
-	Board* myBoard;
-
-	//==============================================================================
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PrevStateComponent)
-};
-
-class NextStateComponent : public Component
-{
-public:
-	NextStateComponent() {}
-	void paint(Graphics& g) override;
-	Board* GetBoard() { return myBoard; }
-private:
-	Board* myBoard;
-
-	//==============================================================================
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NextStateComponent)
-};
-
 class BoardStateButton : public TextButton
 {
 public:
-	BoardStateButton() {}
+	BoardStateButton(const std::string in_fen, const std::string in_algebraic) :
+		fen(in_fen), algebraic(in_algebraic) {
+		setName(in_algebraic);
+	}
 	void paint(Graphics& g) override;
 private:
-	Board* myBoard;
-
+	std::string fen;
+	std::string algebraic;
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoardStateButton)
 };
@@ -69,11 +46,14 @@ public:
 	NotationComponent(Board* inBoard);
 	void resized() override;
 	void paint(Graphics& g) override;
-	void addBoardState();
+	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 private:
 	Board* myBoard;
-	NextStateComponent next;
-	PrevStateComponent prev;
+	TextButton start;
+	TextButton next;
+	TextButton prev;
+	TextButton end;
+	int currNode;
 	OwnedArray<BoardStateButton> boardStates;
 
 	//==============================================================================

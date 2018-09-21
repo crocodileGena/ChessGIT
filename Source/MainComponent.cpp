@@ -19,7 +19,7 @@ boardStatus(boardGUI.GetBoard())
 	addAndMakeVisible(boardStatus);
 	addAndMakeVisible(gameNotation);
 
-	resetBoard.onClick = [this] { boardGUI.ResetClicked(); };
+	resetBoard.onClick = [this] { boardGUI.ResetClicked(); GetGameNotation()->Reset(); };
     setSize (800, 600);
 }
 

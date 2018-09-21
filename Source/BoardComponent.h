@@ -47,6 +47,7 @@ public:
 	void resized() override;
 	void paint(Graphics& g) override;
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
+	void Reset() { boardStates.clear(); }
 private:
 	Board* myBoard;
 	TextButton start;

@@ -48,6 +48,7 @@ class GameNotation
 public:
 	GameNotation() {}
 	~GameNotation() { m_vNotation.clear(); }
+	void Reset() { m_vNotation.clear(); }
 
 	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
 		Square in_origin, const Square in_dest, const bool isCapture,

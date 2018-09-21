@@ -48,6 +48,7 @@ void Board::ResetBoard()
 	m_queeningMode = false;
 	m_status = "status bar";
 	m_halfmoveClock = 0;
+	m_gameNotation.Reset();
 
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;

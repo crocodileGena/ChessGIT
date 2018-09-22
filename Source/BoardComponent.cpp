@@ -301,8 +301,8 @@ void MovesComponent::addBoardState(const std::string &in_fen, const std::string 
 
 void MovesComponent::resized()
 {
-	int xWhite(20);
-	int xBlack(85);
+	int xWhite(30);
+	int xBlack(90);
 	int yPos(-moveButtonHeight + buttonSpacing);
 	int xPos(xWhite);
 	int moveNumber(1);
@@ -339,14 +339,15 @@ void NotationComponent::resized()
 	int movesComponentHeight = (moveNumber) * (moveButtonHeight + buttonSpacing) + buttonSpacing;
 	movesComponent.setBounds(0,0, componentBounds.getRight() - 10, movesComponentHeight);
 	vpMovesComponent.setBounds(0, 2, componentBounds.getRight(), 350);
+	vpMovesComponent.setViewPositionProportionately(1, 1);
 }
 
 void MovesComponent::paint(Graphics& g)
 {
 	int yPos(-moveButtonHeight + buttonSpacing);
-	int moveNumber(1);
+	int numStates = boardStates.size();
 	Rectangle<float> rect(5, yPos, 15, 20);
-	for (auto currState : boardStates)
+	for (int moveNumber = 1; moveNumber <= numStates; ++moveNumber)
 	{
 		if (moveNumber % 2)
 			yPos = yPos + moveButtonHeight + buttonSpacing;
@@ -361,8 +362,6 @@ void MovesComponent::paint(Graphics& g)
 void BoardStateButton::paint(Graphics& g)
 {
 	TextButton::paint(g);
-	//g.setColour(Colours::grey);
-	//g.fillRect(getLocalBounds());
 	g.setColour(Colours::grey);
 	g.drawText(getName(), getLocalBounds(), Justification::centred, true);
 }

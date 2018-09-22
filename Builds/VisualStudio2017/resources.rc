@@ -14,9 +14,9 @@ BEGIN
     BLOCK "040904E4"
     BEGIN
       VALUE "FileDescription",  "ChessGUI\0"
-      VALUE "FileVersion",  "1.0.0\1"
+      VALUE "FileVersion",  "1.0.0\0"
       VALUE "ProductName",  "ChessGUI\0"
-      VALUE "ProductVersion",  "1.0.1\0"
+      VALUE "ProductVersion",  "1.0.2\0"
     END
   END
 

@@ -77,7 +77,7 @@ bool IsHorizontalClear(Board &board, const Square source, const Square dest)
 	int horizontalPolarity = dest.GetFile() - source.GetFile() > 0 ? 1 : -1;
 	Square next(source.GetFile() + horizontalPolarity, source.GetRank() );
 
-	if (nullptr != board.GetPiece(next) && next.GetRank() != dest.GetRank())
+	if (nullptr != board.GetPiece(next) && next.GetFile() != dest.GetFile())
 		return false;
 
 	return IsHorizontalClear(board, next, dest);

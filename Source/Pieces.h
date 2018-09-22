@@ -15,6 +15,7 @@ public:
 	virtual void OnPieceMoved(Board& in_board) {};
 	virtual bool MakeMove(Board &board, const Square source, const Square dest) = 0;
 	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
+	virtual bool isEnPassant(const Color in_color, const Square in_source, const Square in_dest) { return false; }
 
 	int m_worth;
 	Color m_color;
@@ -24,12 +25,18 @@ public:
 class Pawn : public Piece
 {
 public:
-	Pawn(const Color in_color) : Piece(in_color) { m_worth = Worth::ePawn; m_name = "P";
+	Pawn(const Color in_color) : Piece(in_color), m_enpassantCaptured(false)
+	{ 
+		m_worth = Worth::ePawn; m_name = "P";
 	}
 	~Pawn() {}
 
 	bool MakeMove(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	void OnPieceMoved(Board &board) override;
+	bool isEnPassant(const Color in_color, const Square in_source, const Square in_dest) override;
+private:
+	bool m_enpassantCaptured;
 };
 
 class Bishop : public Piece

@@ -172,20 +172,6 @@ void Board::UpdateCastlingFlag(const Piece* in_piece, const Square in_origin)
 
 }
 
-Square Board::GetEnPassantSquare(const Square inBase, const Square inDest)
-{
-	Square retVal;
-	Piece* piece = GetPiece(inBase);
-	if (piece->m_worth == ePawn && piece->m_color == eWhite && inBase.GetRank() == Two &&
-		inDest.GetRank() == Four && inBase.GetFile() == inDest.GetFile())
-		retVal.SetSquare(inDest.GetFile(), inDest.GetRank() - 1);
-	else if (piece->m_worth == ePawn && piece->m_color == eBlack && inBase.GetRank() == Seven &&
-		inDest.GetRank() == Five && inBase.GetFile() == inDest.GetFile())
-		retVal.SetSquare(inDest.GetFile(), inDest.GetRank() + 1);
-
-	return retVal;
-}
-
 void Board::UpdateHalfmoveClock(const bool isCapture, const bool isPawn)
 {
 	if (isCapture || isPawn)
@@ -227,7 +213,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			const bool specifyFile = false; //ToDO : Implement this
 			const bool whitesMove = currPiece->m_color == eBlack;
 			const bool* castlingOptions = GetCastlingFlag();
-			const Square enPassant = GetEnPassantSquare(inBase, inDest);
+			const Square enPassant = GetEnPassantSquare();
 			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 			SetPiece(inBase, nullptr);
 			SetPiece(inDest, currPiece);
@@ -236,7 +222,9 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			m_lastColorMoved = currPiece->m_color;
 			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
 									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-									enPassant, m_halfmoveClock);
+									enPassant, m_halfmoveClock); 
+			if (!currPiece->isEnPassant(currPiece->m_color, inBase, inDest))
+				SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
 			isPieceMoved = true;
 		}
 

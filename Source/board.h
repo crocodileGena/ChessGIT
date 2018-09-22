@@ -85,7 +85,8 @@ public:
 	std::string GetPiecesPosition();
 	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);
 	bool* GetCastlingFlag() { return m_castlingFlag; }
-	Square GetEnPassantSquare(const Square inBase, const Square inDest);
+	Square GetEnPassantSquare() { return m_enPassantSquare; }
+	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
 	bool GetQueeningMode() { return m_queeningMode; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
@@ -98,4 +99,6 @@ public:
 	bool m_castlingFlag[numCastlingOptions];
 	int m_halfmoveClock;
 	bool m_queeningMode;
+private:
+	Square m_enPassantSquare;
 };

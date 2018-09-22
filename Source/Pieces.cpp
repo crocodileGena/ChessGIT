@@ -116,6 +116,20 @@ bool ArePiecesInWay(Board &board, const Square source, const Square dest)
 bool Pawn::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
+	m_enpassantCaptured = false;
+	// allow en passant capture
+	Square enpassantSquare = board.GetEnPassantSquare();
+	if (enpassantSquare.GetFile() != kIllegalSquare &&
+		((Color::eWhite == m_color) &&
+		(enpassantSquare.GetFile() == (source.GetFile() + 1) || (enpassantSquare.GetFile() == (source.GetFile() - 1))) &&
+			(enpassantSquare.GetRank() == (source.GetRank() + 1)))
+		|| ((Color::eBlack == m_color) &&
+		(enpassantSquare.GetFile() == (source.GetFile() + 1) || (enpassantSquare.GetFile() == (source.GetFile() - 1))) &&
+			(enpassantSquare.GetRank() == (source.GetRank() - 1))))
+	{
+		retVal = true;
+		m_enpassantCaptured = true;
+	}
 	// allow one straight move if not blocked.
 	if ((((Color::eWhite == m_color) &&
 		(dest.GetRank() == (source.GetRank() + 1)) &&
@@ -138,18 +152,25 @@ bool Pawn::MakeMove(Board &board, const Square source, const Square dest)
 		eWhite == board.GetPiece(dest)->m_color))
 		retVal = true;
 	// allow two steps from start if not blocked.
-	if ( (Color::eWhite == m_color &&
+	if ((Color::eWhite == m_color &&
 		Two == source.GetRank() &&
-		Four == dest.GetRank() && 
+		Four == dest.GetRank() &&
 		source.GetFile() == dest.GetFile() &&
 		nullptr == board.GetPiece(dest)))
+	{
 		retVal = true;
-	else if ( (Color::eBlack == m_color &&
-		Seven == source.GetRank() && 
+		board.SetEnPassantSquare({ dest.GetFile(), dest.GetRank() - 1 });
+	}
+	else if ((Color::eBlack == m_color &&
+		Seven == source.GetRank() &&
 		Five == dest.GetRank() &&
 		source.GetFile() == dest.GetFile() &&
-		nullptr == board.GetPiece(dest)) )
+		nullptr == board.GetPiece(dest)))
+	{
 		retVal = true;
+		board.SetEnPassantSquare({ dest.GetFile(), dest.GetRank() + 1 });
+
+	}
 
 	if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
 		board.SetQueeningMode(true);
@@ -366,4 +387,26 @@ std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal;
 	return retVal;
+}
+
+bool Pawn::isEnPassant(const Color in_color, const Square in_source, const Square in_dest)
+{
+	bool retVal = false;
+	if (in_color == eWhite && in_source.GetRank() == Two && in_dest.GetRank() == Four)
+		retVal = true;
+	else if (in_color == eBlack && in_source.GetRank() == Seven && in_dest.GetRank() == Five)
+		retVal = true;
+
+	return retVal;
+}
+
+void Pawn::OnPieceMoved(Board &board)
+{
+	Square enPassantSquare = board.GetEnPassantSquare();
+	if (m_enpassantCaptured && enPassantSquare.GetFile() != kIllegalSquare)
+	{
+		Square removeEatenPawn = enPassantSquare;
+		removeEatenPawn.SetRank(enPassantSquare.GetRank() == Six ? Five : Four);
+		board.SetPiece(removeEatenPawn, nullptr);
+	}
 }

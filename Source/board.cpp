@@ -149,7 +149,7 @@ std::string Board::GetPiecesPosition()
 void Board::UpdateCastlingFlag(const Piece* in_piece, const Square in_origin)
 {
 	int piece = in_piece->m_worth;
-	if (piece != eKing || piece != eRook)
+	if (piece != eKing && piece != eRook)
 		return;
 	if (in_piece->m_color == eWhite && piece == eKing)
 	{
@@ -232,7 +232,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			SetPiece(inBase, nullptr);
 			SetPiece(inDest, currPiece);
 			UpdateCastlingFlag(currPiece, inBase);
-			currPiece->OnPieceMoved();
+			currPiece->OnPieceMoved(*this);
 			m_lastColorMoved = currPiece->m_color;
 			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
 									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,

@@ -12,7 +12,7 @@ public:
 	Piece(const Color in_color) : m_worth(0), m_color(in_color) {}
 	~Piece() {}
 
-	virtual void OnPieceMoved() {};
+	virtual void OnPieceMoved(Board& in_board) {};
 	virtual bool MakeMove(Board &board, const Square source, const Square dest) = 0;
 	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
 
@@ -60,7 +60,7 @@ public:
 	}
 	~Rook() {}
 
-	void OnPieceMoved() override;
+	void OnPieceMoved(Board &board) override;
 	bool MakeMove(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 
@@ -81,14 +81,20 @@ public:
 class King : public Piece
 {
 public:
-	King(const Color in_color) : Piece(in_color), m_bCastleAllowed(true) { m_worth = Worth::eKing; m_name = "K";
+	King(const Color in_color) : 
+		Piece(in_color),
+		m_bCastleAllowed(true),
+		m_castleRookSquare(kIllegalSquare, kIllegalSquare)
+	{ m_worth = Worth::eKing; m_name = "K";
 	}
 	~King() {}
 
-	void OnPieceMoved() override;
+	void OnPieceMoved(Board &board) override;
 	bool MakeMove(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 
 	bool m_bCastleAllowed;
+private:
+	Square m_castleRookSquare;
 };
 

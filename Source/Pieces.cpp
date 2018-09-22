@@ -231,7 +231,7 @@ bool Queen::MakeMove(Board &board, const Square source, const Square dest)
 bool King::MakeMove(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
-
+	m_castleRookSquare = { kIllegalSquare, kIllegalSquare };
 	// check if 1 step away
 	int fileDiff = abs(dest.GetFile() - source.GetFile());
 	int rankDiff = abs(dest.GetRank() - source.GetRank());
@@ -255,7 +255,10 @@ bool King::MakeMove(Board &board, const Square source, const Square dest)
 		if (rook)
 		{
 			if (rook->m_bCastleAllowed && IsHorizontalClear(board, source, { rookFile, dest.GetRank() }))
+			{
+				m_castleRookSquare = { rookFile, dest.GetRank() };
 				retVal = true;
+			}
 		}
 	}
 		
@@ -263,12 +266,17 @@ bool King::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-void King::OnPieceMoved()
+void King::OnPieceMoved(Board &board)
 {
 	m_bCastleAllowed = false;
+	Piece *piece = board.GetPiece(m_castleRookSquare);
+	board.SetPiece(m_castleRookSquare, nullptr);
+	m_castleRookSquare.SetFile(m_castleRookSquare.GetFile() == H ? F : D);
+	board.SetPiece(m_castleRookSquare, piece);
+	m_castleRookSquare = { kIllegalSquare, kIllegalSquare };
 }
 
-void Rook::OnPieceMoved()
+void Rook::OnPieceMoved(Board &board)
 {
 	m_bCastleAllowed = false;
 }

@@ -2,6 +2,12 @@
 
 #define kIllegalSquare 8
 
+const int staticButtonHeight = 20;
+const int moveButtonHeight = 20;
+const int staticButtonWidth = 30;
+const int moveButtonWidth = 50;
+const int buttonSpacing = 5;
+
 enum PieceLocation
 {
 	eFile = 0,

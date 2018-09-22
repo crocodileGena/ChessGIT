@@ -227,6 +227,7 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		MainComponent *parentComponent = dynamic_cast<MainComponent*>(getParentComponent());
 		NotationComponent *gameNotationComponent = parentComponent->GetGameNotation();
 		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
+		gameNotationComponent->resized();
 	}
 
 	if (myBoard->GetQueeningMode())
@@ -264,24 +265,32 @@ void StatusComponent::paint(Graphics& g)
 
 NotationComponent::NotationComponent(Board* inBoard) : 
 myBoard(inBoard),
-start("Start"),
-next("Next"),
-prev("Prev"),
-end("End")
+start("<<"),
+next(">"),
+prev("<"),
+end(">>")
 {
+	vpMovesComponent.setViewedComponent(&movesComponent, false);
 	addAndMakeVisible(next);
 	addAndMakeVisible(prev);
 	addAndMakeVisible(start);
 	addAndMakeVisible(end);
+	addAndMakeVisible(vpMovesComponent);
 }
 
 void NotationComponent::paint(Graphics& g)
 {
+	auto bounds = getLocalBounds();
 	g.setColour(Colours::white);
-	g.drawRect(getLocalBounds());
+	g.drawRect(bounds);
 }
 
 void NotationComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
+{
+	movesComponent.addBoardState(in_fen, in_algebraic);
+}
+
+void MovesComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
 	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic);
 	boardStates.add(newState);
@@ -290,30 +299,18 @@ void NotationComponent::addBoardState(const std::string &in_fen, const std::stri
 	resized();
 }
 
-void NotationComponent::resized()
+void MovesComponent::resized()
 {
-	auto componentBounds(getLocalBounds());
-	int buttonSize(44);
-	int spacing(5);
-	Rectangle<int> currRect(spacing, componentBounds.getBottom() - buttonSize - spacing, buttonSize, 20);
-	start.setBounds(currRect);
-	currRect.setX(currRect.getRight() + spacing);
-	prev.setBounds(currRect);
-	currRect.setX(currRect.getRight() + spacing);
-	next.setBounds(currRect);
-	currRect.setX(currRect.getRight() + spacing);
-	end.setBounds(currRect);
-
 	int xWhite(20);
-	int xBlack(130);
-	int yPos(10);
+	int xBlack(85);
+	int yPos(-moveButtonHeight + buttonSpacing);
 	int xPos(xWhite);
 	int moveNumber(1);
 	for (auto currState : boardStates)
 	{
 		if (moveNumber % 2)
 		{
-			yPos = yPos + 25;
+			yPos = yPos + moveButtonHeight + buttonSpacing;
 			xPos = xWhite;
 		}
 		else
@@ -321,7 +318,42 @@ void NotationComponent::resized()
 			xPos = xBlack;
 		}
 
-		currState->setBounds(xPos, yPos, 50, 20);
+		currState->setBounds(xPos, yPos, moveButtonWidth, moveButtonHeight);
+		moveNumber++;
+	}
+}
+
+void NotationComponent::resized()
+{
+	auto componentBounds(getLocalBounds());
+	Rectangle<int> currRect(buttonSpacing, componentBounds.getBottom() - staticButtonHeight - buttonSpacing, staticButtonWidth, staticButtonHeight);
+	start.setBounds(currRect);
+	currRect.setX(currRect.getRight() + buttonSpacing);
+	prev.setBounds(currRect);
+	currRect.setX(currRect.getRight() + buttonSpacing);
+	next.setBounds(currRect);
+	currRect.setX(currRect.getRight() + buttonSpacing);
+	end.setBounds(currRect);
+
+	int moveNumber = movesComponent.GetNumberofMoves();
+	int movesComponentHeight = (moveNumber) * (moveButtonHeight + buttonSpacing) + buttonSpacing;
+	movesComponent.setBounds(0,0, componentBounds.getRight() - 10, movesComponentHeight);
+	vpMovesComponent.setBounds(0, 2, componentBounds.getRight(), 350);
+}
+
+void MovesComponent::paint(Graphics& g)
+{
+	int yPos(-moveButtonHeight + buttonSpacing);
+	int moveNumber(1);
+	Rectangle<float> rect(5, yPos, 15, 20);
+	for (auto currState : boardStates)
+	{
+		if (moveNumber % 2)
+			yPos = yPos + moveButtonHeight + buttonSpacing;
+
+		g.setColour(Colours::navajowhite);
+		rect.setY(yPos);
+		g.drawText(std::to_string((int)((double)moveNumber / 2 + 0.6)), rect, Justification::centredLeft);
 		moveNumber++;
 	}
 }

@@ -40,6 +40,24 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoardStateButton)
 };
 
+class MovesComponent : public Viewport
+{
+public:
+	MovesComponent() {}
+	void resized() override;
+	void paint(Graphics& g) override;
+	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
+	void Reset() { boardStates.clear(); }
+	int GetNumberofMoves() { return int(((double)boardStates.size() / 2) + 0.6); }
+
+private:
+	int currNode;
+	OwnedArray<BoardStateButton> boardStates;
+
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MovesComponent)
+};
+
 class NotationComponent : public Component
 {
 public:
@@ -47,15 +65,15 @@ public:
 	void resized() override;
 	void paint(Graphics& g) override;
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
-	void Reset() { boardStates.clear(); }
+	void Reset() { movesComponent.Reset(); resized(); }
 private:
 	Board* myBoard;
 	TextButton start;
 	TextButton next;
 	TextButton prev;
 	TextButton end;
-	int currNode;
-	OwnedArray<BoardStateButton> boardStates;
+	MovesComponent movesComponent;
+	Viewport vpMovesComponent;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NotationComponent)

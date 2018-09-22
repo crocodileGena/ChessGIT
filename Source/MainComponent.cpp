@@ -42,7 +42,7 @@ void MainComponent::resized()
 	boardGUI.setBounds(0, 0, 515, 515);
 	resetBoard.setBounds(550, 20, 100, 20);
 	boardStatus.setBounds(20, 520, 100, 20);
-	gameNotation.setBounds(550, 100, 200, 400);	
+	gameNotation.setBounds(550, 100, 150, 400);	
 }
 
 //==============================================================================

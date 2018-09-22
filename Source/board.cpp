@@ -267,7 +267,7 @@ std::string GameNotation::GetFENFromPosition(const std::string in_position, cons
 	retVal += " ";
 	retVal += std::to_string(halfmoveClock);
 	retVal += " ";
-	int moveNumber = int(double(m_vNotation.size() + 1 / 2) + 0.6);
+	int moveNumber = int(((double)m_vNotation.size() / 2) + 0.6);
 	retVal += std::to_string(moveNumber);
 	return retVal;
 }

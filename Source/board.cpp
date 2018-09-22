@@ -345,11 +345,14 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 {
 	std::string retVal;
 	retVal += pieceName == "P" ? "" : pieceName;
+	if (pieceName == "P" && isCapture)
+		retVal += char(in_origin.GetFile() + 'a');
 	retVal += isCapture ? "x" : "";
 	retVal += char(in_dest.GetFile() + 'a');
 	retVal += char(in_dest.GetRank() + '1');
 	return retVal;
 }
+
 //void GameNotation::PrintNotation()
 //{
 //	std::for_each(m_vNotation.begin(), m_vNotation.end(), [](NotationNode currNode) {currNode.Print(); });

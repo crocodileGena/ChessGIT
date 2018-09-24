@@ -206,7 +206,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	if (!GetQueeningMode() && currPiece)
 		if (m_lastColorMoved == currPiece->m_color)
 			std::cout << "Same color ";
-		else if (currPiece->MakeMove(*this, inBase, inDest))
+		else if (currPiece->IsMoveLegal(*this, inBase, inDest))
 		{
 			const bool isCapture = GetPiece(inDest) != nullptr;
 			const bool specifyRank = false; //TODO : Implement this
@@ -365,21 +365,39 @@ std::string Square::toString() const
 bool Board::CheckIsCheck()
 {
 	bool retVal = false;
-
-	for (int i = 0; i < BoardSize; ++i)
+	bool keepSearching = true;
+	for (int i = 0; i < BoardSize && keepSearching; ++i)
+	{
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			Piece* currPiece = GetPiece({ i,j });
 			if (currPiece && m_lastColorMoved == currPiece->m_color)
 			{
 				std::vector<Piece*> captures = currPiece->CanPieceCapture(*this, { i,j });
-				for (auto currCapture : captures)
+				if (CanPieceCaptureKing(captures))
 				{
-					if (dynamic_cast<King*>(currCapture))
-						return true;
+					keepSearching = false;
+					retVal = true;
+					break;
 				}
 			}
 		}
+	}
+	return retVal;
+}
+
+bool Board::CanPieceCaptureKing(std::vector<Piece *> &captures)
+{
+	bool retVal = false;
+	for (auto currCapture : captures)
+	{
+		if (dynamic_cast<King*>(currCapture))
+		{
+			retVal = true;
+			break;
+		}
+	}
+
 	return retVal;
 }
 

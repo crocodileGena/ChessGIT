@@ -100,5 +100,6 @@ public:
 	int m_halfmoveClock;
 	bool m_queeningMode;
 private:
+	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 	Square m_enPassantSquare;
 };

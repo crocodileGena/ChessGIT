@@ -113,7 +113,7 @@ bool ArePiecesInWay(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Pawn::MakeMove(Board &board, const Square source, const Square dest)
+bool Pawn::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	m_enpassantCaptured = false;
@@ -178,7 +178,7 @@ bool Pawn::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Bishop::MakeMove(Board &board, const Square source, const Square dest)
+bool Bishop::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// allow only if on diagonal and no pieces are in the way and if dest if vacant or oponent's piece
@@ -196,7 +196,7 @@ bool Bishop::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Knight::MakeMove(Board &board, const Square source, const Square dest)
+bool Knight::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// check the 8 possible knight moves 
@@ -216,7 +216,7 @@ bool Knight::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Rook::MakeMove(Board &board, const Square source, const Square dest)
+bool Rook::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// Check if straight path
@@ -232,7 +232,7 @@ bool Rook::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool Queen::MakeMove(Board &board, const Square source, const Square dest)
+bool Queen::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	// Check if straight or diagonal path
@@ -249,7 +249,7 @@ bool Queen::MakeMove(Board &board, const Square source, const Square dest)
 	return retVal;
 }
 
-bool King::MakeMove(Board &board, const Square source, const Square dest)
+bool King::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
 	m_castleRookSquare = { kIllegalSquare, kIllegalSquare };
@@ -297,7 +297,7 @@ void King::OnPieceMoved(Board &board)
 	m_castleRookSquare = { kIllegalSquare, kIllegalSquare };
 }
 
-void Rook::OnPieceMoved(Board &board)
+void Rook::OnPieceMoved(Board &/*board*/)
 {
 	m_bCastleAllowed = false;
 }
@@ -383,7 +383,7 @@ std::vector<Piece*> Queen::CanPieceCapture(Board &board, const Square source)
 	return retVal;
 }
 
-std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
+std::vector<Piece*> King::CanPieceCapture(Board &/*board*/, const Square source)
 {
 	std::vector<Piece*> retVal;
 	return retVal;

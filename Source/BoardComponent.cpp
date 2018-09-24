@@ -33,14 +33,14 @@ knightButton("knightSelection")
 	File knightFile(workingDir + colorLetter + "Knight.png");
 	knightImage = ImageFileFormat::loadFrom(knightFile);
 
-	rookButton.setImages(true, false, true, rookImage, 0.8, Colours::transparentBlack, rookImage,
-		1.0, Colours::transparentBlack, rookImage, 0.8, Colours::transparentBlack);
-	queenButton.setImages(true, false, true, queenImage, 0.8, Colours::transparentBlack, queenImage,
-		1.0, Colours::transparentBlack, queenImage, 0.8, Colours::transparentBlack);
-	bishopButton.setImages(true, false, true, bishopImage, 0.8, Colours::transparentBlack, bishopImage,
-		1.0, Colours::transparentBlack, bishopImage, 0.8, Colours::transparentBlack);
-	knightButton.setImages(true, false, true, knightImage, 0.8, Colours::transparentBlack, knightImage,
-		1.0, Colours::transparentBlack, knightImage, 0.8, Colours::transparentBlack);
+	rookButton.setImages(true, false, true, rookImage, 0.8f, Colours::transparentBlack, rookImage,
+		1.0f, Colours::transparentBlack, rookImage, 0.8f, Colours::transparentBlack);
+	queenButton.setImages(true, false, true, queenImage, 0.8f, Colours::transparentBlack, queenImage,
+		1.0f, Colours::transparentBlack, queenImage, 0.8f, Colours::transparentBlack);
+	bishopButton.setImages(true, false, true, bishopImage, 0.8f, Colours::transparentBlack, bishopImage,
+		1.0f, Colours::transparentBlack, bishopImage, 0.8f, Colours::transparentBlack);
+	knightButton.setImages(true, false, true, knightImage, 0.8f, Colours::transparentBlack, knightImage,
+		1.0f, Colours::transparentBlack, knightImage, 0.8f, Colours::transparentBlack);
 
 	addAndMakeVisible(rookButton);
 	addAndMakeVisible(queenButton);
@@ -224,8 +224,8 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		// get notation from board
 		auto newNode = myBoard->m_gameNotation.GetLastNode();
 		// pass it to GUI Notation
-		MainComponent *parentComponent = dynamic_cast<MainComponent*>(getParentComponent());
-		NotationComponent *gameNotationComponent = parentComponent->GetGameNotation();
+		MainComponent *myParentComponent = dynamic_cast<MainComponent*>(getParentComponent());
+		NotationComponent *gameNotationComponent = myParentComponent->GetGameNotation();
 		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
 		gameNotationComponent->resized();
 	}
@@ -344,9 +344,9 @@ void NotationComponent::resized()
 
 void MovesComponent::paint(Graphics& g)
 {
-	int yPos(-moveButtonHeight + buttonSpacing);
+	float yPos(-moveButtonHeight + buttonSpacing);
 	int numStates = boardStates.size();
-	Rectangle<float> rect(5, yPos, 15, 20);
+	Rectangle<float> rect(5.0f, yPos, 15.0f, 20.0f);
 	for (int moveNumber = 1; moveNumber <= numStates; ++moveNumber)
 	{
 		if (moveNumber % 2)

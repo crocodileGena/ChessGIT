@@ -124,6 +124,13 @@ enum Color
 	eBlack
 };
 
+enum CheckOrMate
+{
+	eNone = 0,
+	eCheck,
+	eMate
+};
+
 enum Worth
 {
 	ePawn = 1,

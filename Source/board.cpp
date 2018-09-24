@@ -222,6 +222,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
 {
 	bool retVal = true;
+	CheckOrMate checkOrMate = eNone;
 
 	// Prepare parameters
 	const Square enPassantDestSquare = GetEnPassantSquare();
@@ -237,12 +238,17 @@ bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &in
 	currPiece->OnPieceMoved(*this); // update other affected pieces
 
 	// Update everything accordignly
+	if (CheckIsCheck())
+	{
+		checkOrMate = CheckIsMate() ? eMate : eCheck;
+	}
+
 	UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 	UpdateCastlingFlag(currPiece, inBase);
 	m_lastColorMoved = currPiece->m_color;
 	m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
 		isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-		enPassantDestSquare, m_halfmoveClock);
+		enPassantDestSquare, m_halfmoveClock, checkOrMate);
 	if (!currPiece->isEnPassantMove(currPiece->m_color, inBase, inDest))
 		SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
 
@@ -330,19 +336,19 @@ void GameNotation::PositionToString(const std::string &in_position, std::string 
 		}
 	}
 }
-void GameNotation::PushMove(const std::string &in_piecesPosition, const std::string &pieceName, 
+void GameNotation::PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
 							const Square in_origin, const Square in_dest, const bool isCapture,
 							const bool specifyRank, const bool specifyFile, const bool whitesMove,
-							const bool* castlingOptions, const Square enPassant, 
-							const int halfmoveClock)
+							const bool* castlingOptions, const Square enPassant, const int halfmoveClock,
+							CheckOrMate checkOrMate)
 {
 	std::string fen = GetFENFromPosition(in_piecesPosition, whitesMove, castlingOptions, enPassant, halfmoveClock);
-	std::string algebraic = GetAlgebraic(pieceName, in_origin, in_dest, isCapture, specifyRank, specifyFile);
+	std::string algebraic = GetAlgebraic(pieceName, in_origin, in_dest, isCapture, specifyRank, specifyFile, checkOrMate);
 	NotationNode newNode(algebraic, fen);
 	m_vNotation.push_back(newNode);
 }
 
-std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile)
+std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate)
 {
 	std::string retVal;
 	retVal += pieceName == "P" ? "" : pieceName;
@@ -351,6 +357,11 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 	retVal += isCapture ? "x" : "";
 	retVal += char(in_dest.GetFile() + 'a');
 	retVal += char(in_dest.GetRank() + '1');
+	if (checkOrMate == eCheck)
+		retVal += "+";
+	else if (checkOrMate == eMate)
+		retVal += "#";
+
 	return retVal;
 }
 
@@ -384,7 +395,7 @@ bool Board::CheckIsCheck()
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			Piece* currPiece = GetPiece({ i,j });
-			if (currPiece && m_lastColorMoved == currPiece->m_color)
+			if (currPiece && m_lastColorMoved != currPiece->m_color)
 			{
 				std::vector<Piece*> captures = currPiece->CanPieceCapture(*this, { i,j });
 				if (CanPieceCaptureKing(captures))

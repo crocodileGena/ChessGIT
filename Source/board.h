@@ -50,14 +50,13 @@ public:
 	~GameNotation() { m_vNotation.clear(); }
 	void Reset() { m_vNotation.clear(); }
 
-	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
-		Square in_origin, const Square in_dest, const bool isCapture,
-		const bool specifyRank, const bool specifyFile, const bool whitesMove,
-		const bool* castlingOptions, const Square enPassant, const int halfmoveClock);
+	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName, Square in_origin, const Square in_dest,
+					const bool isCapture, const bool specifyRank, const bool specifyFile,
+					const bool whitesMove, const bool* castlingOptions, const Square enPassant, const int halfmoveClock, CheckOrMate checkOrMate);
 	NotationNode GetLastNode() { return m_vNotation.back(); }
 
 private:
-	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile);
+	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate);
 	std::string GetFENFromPosition(const std::string in_position, const bool whitesMove,
 		const bool* castlingOptions, const Square enPassant,
 		const int halfmoveClock);
@@ -81,6 +80,7 @@ public:
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
 	void PrintPiecesSum();
 	bool CheckIsCheck();
+	bool CheckIsMate() { return false; }
 	std::string GetStatus() { return m_status; }
 	std::string GetPiecesPosition();
 	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);

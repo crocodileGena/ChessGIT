@@ -205,27 +205,10 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	auto currPiece = GetPiece(inBase);
 	if (!GetQueeningMode() && currPiece)
 		if (m_lastColorMoved == currPiece->m_color)
-			std::cout << "Same color ";
+			m_status = "Same color ";
 		else if (currPiece->IsMoveLegal(*this, inBase, inDest))
 		{
-			const bool isCapture = GetPiece(inDest) != nullptr;
-			const bool specifyRank = false; //TODO : Implement this
-			const bool specifyFile = false; //ToDO : Implement this
-			const bool whitesMove = currPiece->m_color == eBlack;
-			const bool* castlingOptions = GetCastlingFlag();
-			const Square enPassant = GetEnPassantSquare();
-			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
-			SetPiece(inBase, nullptr);
-			SetPiece(inDest, currPiece);
-			UpdateCastlingFlag(currPiece, inBase);
-			currPiece->OnPieceMoved(*this);
-			m_lastColorMoved = currPiece->m_color;
-			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest, 
-									isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-									enPassant, m_halfmoveClock); 
-			if (!currPiece->isEnPassant(currPiece->m_color, inBase, inDest))
-				SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
-			isPieceMoved = true;
+			isPieceMoved  = CommitMove(currPiece, inBase, inDest);
 		}
 
 	if (!isPieceMoved)
@@ -234,6 +217,36 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 		CheckIsCheck();
 
 	return isPieceMoved;
+}
+
+bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
+{
+	bool retVal = true;
+
+	// Prepare parameters
+	const Square enPassantDestSquare = GetEnPassantSquare();
+	const bool isCapture = GetPiece(inDest) != nullptr || enPassantDestSquare == inDest;
+	const bool specifyRank = false; //TODO : Implement this
+	const bool specifyFile = false; //ToDO : Implement this
+	const bool whitesMove = currPiece->m_color == eBlack;
+	const bool* castlingOptions = GetCastlingFlag();
+
+	// Make the move
+	SetPiece(inBase, nullptr);
+	SetPiece(inDest, currPiece);
+	currPiece->OnPieceMoved(*this); // update other affected pieces
+
+	// Update everything accordignly
+	UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
+	UpdateCastlingFlag(currPiece, inBase);
+	m_lastColorMoved = currPiece->m_color;
+	m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
+		isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
+		enPassantDestSquare, m_halfmoveClock);
+	if (!currPiece->isEnPassantMove(currPiece->m_color, inBase, inDest))
+		SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
+
+	return retVal;
 }
 
 std::string GameNotation::GetFENFromPosition(const std::string in_position, const bool whitesMove,

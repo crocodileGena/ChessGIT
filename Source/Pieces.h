@@ -15,7 +15,7 @@ public:
 	virtual void OnPieceMoved(Board& /*in_board*/) {};
 	virtual bool IsMoveLegal(Board &board, const Square source, const Square dest) = 0;
 	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
-	virtual bool isEnPassant(const Color /*in_color*/, const Square /*in_source*/, const Square /*in_dest*/) { return false; }
+	virtual bool isEnPassantMove(const Color /*in_color*/, const Square /*in_source*/, const Square /*in_dest*/) { return false; }
 
 	int m_worth;
 	Color m_color;
@@ -34,7 +34,7 @@ public:
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 	void OnPieceMoved(Board &board) override;
-	bool isEnPassant(const Color in_color, const Square in_source, const Square in_dest) override;
+	bool isEnPassantMove(const Color in_color, const Square in_source, const Square in_dest) override;
 private:
 	bool m_enpassantCaptured;
 };

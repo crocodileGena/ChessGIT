@@ -389,7 +389,7 @@ std::vector<Piece*> King::CanPieceCapture(Board &/*board*/, const Square source)
 	return retVal;
 }
 
-bool Pawn::isEnPassant(const Color in_color, const Square in_source, const Square in_dest)
+bool Pawn::isEnPassantMove(const Color in_color, const Square in_source, const Square in_dest)
 {
 	bool retVal = false;
 	if (in_color == eWhite && in_source.GetRank() == Two && in_dest.GetRank() == Four)

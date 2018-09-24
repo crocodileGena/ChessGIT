@@ -16,7 +16,7 @@ public:
 	Square(const int file, const int rank) { m_file = file; m_rank = rank; }
 	~Square() {}
 
-	bool operator==(const Square &other) { return (m_file == other.m_file && m_rank == other.m_rank); }
+	bool Square::operator==(const Square &other) const { return (m_file == other.m_file && m_rank == other.m_rank); }
 	int GetFile() const { return m_file; }
 	int GetRank() const { return m_rank; }
 	void SetFile(int in_file) { m_file = in_file; }
@@ -100,6 +100,7 @@ public:
 	int m_halfmoveClock;
 	bool m_queeningMode;
 private:
+	bool CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 	Square m_enPassantSquare;
 };

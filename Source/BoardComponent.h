@@ -124,6 +124,7 @@ private:
 
 	Image background;
 	Image activeSquareImage;
+	Image legalMoveImage;
 	Image bKing;
 	Image wKing;
 	Image wQueen;

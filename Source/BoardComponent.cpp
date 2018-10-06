@@ -134,6 +134,9 @@ void BoardComponent::LoadImages()
 
 	File bp(workingDir + "bPawn.png");
 	bPawn = ImageFileFormat::loadFrom(bp);
+
+	File circle(workingDir + "circle.png");
+	legalMoveImage = ImageFileFormat::loadFrom(circle);
 }
 
 void BoardComponent::paint(Graphics& g)
@@ -191,6 +194,19 @@ void BoardComponent::paint(Graphics& g)
 		else
 			blackQueeningComponent.setVisible(true);
 	}
+	else if (activeSquare.getX() != kIllegalSquare)
+	{
+		const Square mySquare = { activeSquare.getX(), 7 - activeSquare.getY() };
+		Piece* myPiece = myBoard->GetPiece(mySquare);
+		if (myPiece && myPiece->m_color != myBoard->m_lastColorMoved)
+		{
+			std::vector<Move> legalMoves = myPiece->GetLegalMoves(*myBoard, mySquare);
+			for (auto move :legalMoves)
+				g.drawImageAt(legalMoveImage,  move.m_dest.GetFile() * 60 + drawOffset, (7 - move.m_dest.GetRank()) * 60 + drawOffset);
+			
+		}
+	}
+
 }
 
 void BoardComponent::mouseDown(const MouseEvent &event)

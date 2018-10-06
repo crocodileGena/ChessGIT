@@ -4,6 +4,24 @@
 #include <cctype>
 #include "Pieces.h"
 
+Board::Board(const Board& in_board) : 
+m_lastColorMoved(in_board.m_lastColorMoved),
+m_halfmoveClock(in_board.m_halfmoveClock),
+m_status(in_board.m_status),
+m_queeningMode(in_board.m_queeningMode),
+m_enPassantSquare(in_board.m_enPassantSquare),
+m_gameNotation(in_board.m_gameNotation)
+{
+	for (int i = 0; i < BoardSize; ++i)
+		for (int j = 0; j < BoardSize; ++j)
+			{
+				board[i][j] = in_board.board[i][j];
+			}
+
+	for (int i = 0; i < numCastlingOptions; ++i)
+		m_castlingFlag[i] = in_board.GetCastlingFlag()[i];
+}
+
 void Board::PrintPiecesSum()
 {
 	int blackSum = 0;
@@ -203,18 +221,22 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 {
 	bool isPieceMoved = false;
 	auto currPiece = GetPiece(inBase);
-	if (!GetQueeningMode() && currPiece)
+	if (!GetQueeningMode() && currPiece && inBase.InBounds() && inDest.InBounds())
+	{
+		auto legalMoves = GetLegalMoves();
+		Move myMove(inBase, inDest);
 		if (m_lastColorMoved == currPiece->m_color)
 			m_status = "Same color ";
-		else if (currPiece->IsMoveLegal(*this, inBase, inDest))
+		//else if (currPiece->IsMoveLegal(*this, inBase, inDest))
+		else if (legalMoves.end() != std::find(legalMoves.begin(), legalMoves.end(), myMove))
 		{
-			isPieceMoved  = CommitMove(currPiece, inBase, inDest);
+			isPieceMoved = CommitMove(currPiece, inBase, inDest);
 		}
-
+	}
 	if (!isPieceMoved)
 		std::cout << "Illegal Move\n";
-	else
-		CheckIsCheck();
+	//else
+		//CheckIsCheck();
 
 	return isPieceMoved;
 }
@@ -240,7 +262,7 @@ bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &in
 	// Update everything accordignly
 	if (CheckIsCheck())
 	{
-		checkOrMate = CheckIsMate() ? eMate : eCheck;
+		//checkOrMate = CheckIsMate() ? eMate : eCheck;
 	}
 
 	UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
@@ -410,6 +432,46 @@ bool Board::CheckIsCheck()
 	return retVal;
 }
 
+std::vector<Move> Board::GetLegalMoves()
+{
+	std::vector<Move> retVal;
+	for (int i = 0; i < BoardSize; ++i)
+		for (int j = 0; j < BoardSize; ++j)
+		{
+			Piece* currPiece = GetPiece({ i,j });
+			if (currPiece && currPiece->m_color != m_lastColorMoved)
+			{
+				std::vector<Move> pieceMoves = currPiece->GetLegalMoves(*this, { i, j });
+				retVal.insert(retVal.end(), pieceMoves.begin(), pieceMoves.end());
+			}
+
+		}
+	return retVal;
+}
+
+bool Square::InBounds() const
+{
+	return GetFile() <= H && GetRank() <= Eight && GetFile() >= A && GetRank() >= One;
+}
+
+bool Board::CheckIsMate()
+{
+	bool retVal = true;
+	std::vector<Move> legalMoves = GetLegalMoves();
+	// loop over all legal moves, if found 1 move that isn't still in check, return false
+	for (auto move : legalMoves)
+	{
+		//Board dummy(*this);
+		//if (!dummy.CheckIsCheck())
+		//{
+		//	retVal = false;
+		//	break;
+		//}
+	}
+
+	return retVal;
+}
+
 bool Board::CanPieceCaptureKing(std::vector<Piece *> &captures)
 {
 	bool retVal = false;
@@ -425,7 +487,7 @@ bool Board::CanPieceCaptureKing(std::vector<Piece *> &captures)
 	return retVal;
 }
 
-Piece* Board::GetPiece(const Square inLocation)
+Piece* Board::GetPiece(const Square inLocation) const
 {
 	if (inLocation.GetFile() < A || inLocation.GetFile() > H ||
 		inLocation.GetRank() < One || inLocation.GetRank() > Eight)

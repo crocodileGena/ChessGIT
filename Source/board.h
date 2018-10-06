@@ -23,11 +23,21 @@ public:
 	void SetRank(int in_rank) { m_rank = in_rank; }
 	void SetSquare(int in_file, int in_rank) { m_file = in_file; m_rank = in_rank; }
 	std::string toString() const;
+	bool InBounds() const;
 private:
 	int m_rank;
 	int m_file;
 };
 
+struct Move
+{
+	Move() : m_origin({ kIllegalSquare, kIllegalSquare }), m_dest({ kIllegalSquare, kIllegalSquare }) {}
+	Move(const Square in_origin, const Square in_dest) : m_origin(in_origin), m_dest(in_dest) {}
+	bool Move::operator==(const Move &other) const { return (m_origin == other.m_origin && m_dest == other.m_dest); }
+
+	Square m_origin;
+	Square m_dest;
+};
 class NotationNode
 {
 public:
@@ -47,6 +57,8 @@ class GameNotation
 {
 public:
 	GameNotation() {}
+	GameNotation(const GameNotation& in_notation) : m_vNotation(in_notation.m_vNotation)
+	{}
 	~GameNotation() { m_vNotation.clear(); }
 	void Reset() { m_vNotation.clear(); }
 
@@ -64,33 +76,34 @@ private:
 	void GetCastlingString(const bool* in_options, std::string &retVal);
 
 	std::vector<NotationNode> m_vNotation;
-
 };
 
 class Board
 {
 public:
 	Board();
+	Board(const Board& in_board);
 	~Board() {}
 
 	void PrintBoard();
 	void ResetBoard();
 	bool MovePiece(const Square inBase, const Square inDest);
-	Piece* GetPiece(const Square inLocation);
+	Piece* GetPiece(const Square inLocation) const;
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
 	void PrintPiecesSum();
 	bool CheckIsCheck();
-	bool CheckIsMate() { return false; }
+	bool CheckIsMate();
 	std::string GetStatus() { return m_status; }
 	std::string GetPiecesPosition();
 	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);
-	bool* GetCastlingFlag() { return m_castlingFlag; }
-	Square GetEnPassantSquare() { return m_enPassantSquare; }
+	const bool* GetCastlingFlag() const { return m_castlingFlag; }
+	Square GetEnPassantSquare() const { return m_enPassantSquare; }
 	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
 	bool GetQueeningMode() { return m_queeningMode; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
 	void QueenAPawn(const Square in_square, const std::string in_piece);
+	std::vector<Move> GetLegalMoves();
 
 	int m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];

@@ -55,7 +55,7 @@ bool IsHorizontalPath(const Square source, const Square dest)
 	return source.GetRank() == dest.GetRank();
 }
 
-bool IsVerticalClear(Board &board, const Square source, const Square dest)
+bool IsVerticalClear(const Board &board, const Square source, const Square dest)
 {
 	if (source.GetRank() == dest.GetRank())
 		return true;
@@ -96,6 +96,44 @@ bool IsDiagonalClear(Board &board, const Square source, const Square dest)
 		return false;
 
 	return IsDiagonalClear(board, next, dest);
+}
+
+
+void GetLegalLineOfMoves(const Board& board, const Square origin, const Square current, std::vector<Move> &out_moves, const int fileIncrement, const int rankIncrement)
+{
+	//stop if captured
+	if (nullptr != board.GetPiece(current) && board.GetPiece(current)->m_color != board.GetPiece(origin)->m_color)
+		return;
+
+	Square nextSquare(current.GetFile() + fileIncrement, current.GetRank() + rankIncrement);
+	Piece* nextPiece = board.GetPiece(nextSquare);
+	if (!nextSquare.InBounds() ||
+		(nullptr != nextPiece && nextPiece->m_color == board.GetPiece(origin)->m_color))
+		return;
+
+	out_moves.push_back({ origin, nextSquare });
+
+	return GetLegalLineOfMoves(board, origin, nextSquare, out_moves, fileIncrement, rankIncrement);
+}
+
+void GetLegalDiagonalMoves(const Board& board, const Square origin, std::vector<Move> &out_moves)
+{
+	GetLegalLineOfMoves(board, origin, origin, out_moves, 1, 1);
+	GetLegalLineOfMoves(board, origin, origin, out_moves, 1, -1);
+	GetLegalLineOfMoves(board, origin, origin, out_moves, -1, 1);
+	GetLegalLineOfMoves(board, origin, origin, out_moves, -1, -1);
+}
+
+void GetLegalVerticalMoves(const Board& board, const Square origin, std::vector<Move> &out_moves)
+{
+	GetLegalLineOfMoves(board, origin, origin, out_moves, 0, 1);
+	GetLegalLineOfMoves(board, origin, origin, out_moves, 0, -1);
+}
+
+void GetLegalHorizontalMoves(const Board& board, const Square origin, std::vector<Move> &out_moves)
+{
+	GetLegalLineOfMoves(board, origin, origin, out_moves, 1, 0);
+	GetLegalLineOfMoves(board, origin, origin, out_moves, -1, 0);
 }
 
 bool ArePiecesInWay(Board &board, const Square source, const Square dest)
@@ -169,7 +207,6 @@ bool Pawn::IsMoveLegal(Board &board, const Square source, const Square dest)
 	{
 		retVal = true;
 		board.SetEnPassantSquare({ dest.GetFile(), dest.GetRank() + 1 });
-
 	}
 
 	if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
@@ -370,6 +407,170 @@ std::vector<Piece*> Knight::CanPieceCapture(Board &board, const Square source)
 std::vector<Piece*> Rook::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal = StraightCaptures(board, source, m_color ? eWhite : eBlack);
+	return retVal;
+}
+
+std::vector<Move> Pawn::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+	// allow en passant capture
+	Square enpassantSquare = in_board.GetEnPassantSquare();
+	if (enpassantSquare.GetFile() != kIllegalSquare &&
+		((Color::eWhite == m_color) &&
+		(enpassantSquare.GetFile() == (origin.GetFile() + 1) || (enpassantSquare.GetFile() == (origin.GetFile() - 1))) &&
+			(enpassantSquare.GetRank() == (origin.GetRank() + 1)))
+		|| ((Color::eBlack == m_color) &&
+		(enpassantSquare.GetFile() == (origin.GetFile() + 1) || (enpassantSquare.GetFile() == (origin.GetFile() - 1))) &&
+			(enpassantSquare.GetRank() == (origin.GetRank() - 1))))
+	{
+		retVal.push_back({ origin, enpassantSquare });
+	}
+	// allow one straight move if not blocked.
+	Square straightMoveSquareWhite({ origin.GetFile(), origin.GetRank() + 1 });
+	Square straightMoveSquareBlack({ origin.GetFile(), origin.GetRank() -1 });
+	if (Color::eWhite == m_color && nullptr == in_board.GetPiece(straightMoveSquareWhite))
+		retVal.push_back({ origin, straightMoveSquareWhite });
+	else if (Color::eBlack == m_color && nullptr == in_board.GetPiece(straightMoveSquareBlack))
+		retVal.push_back({ origin, straightMoveSquareBlack });
+
+	Square leftCaptureWhite(origin.GetFile() - 1, origin.GetRank() + 1);
+	Square rightCaptureWhite(origin.GetFile() + 1, origin.GetRank() + 1);
+	Square leftCaptureBlack(origin.GetFile() - 1, origin.GetRank() - 1);
+	Square rightCaptureBlack(origin.GetFile() + 1, origin.GetRank() - 1);
+
+	// allow capture if piece exists on destination.
+	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(leftCaptureWhite) &&
+		eBlack == in_board.GetPiece(leftCaptureWhite)->m_color)
+		retVal.push_back({ origin, leftCaptureWhite });
+	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(rightCaptureWhite) &&
+		eBlack == in_board.GetPiece(rightCaptureWhite)->m_color)
+		retVal.push_back({ origin, rightCaptureWhite });
+	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(leftCaptureBlack) &&
+		eBlack == in_board.GetPiece(leftCaptureBlack)->m_color)
+		retVal.push_back({ origin, leftCaptureBlack });
+	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(rightCaptureBlack) &&
+		eBlack == in_board.GetPiece(rightCaptureBlack)->m_color)
+		retVal.push_back({ origin, rightCaptureBlack });
+
+	Square twoStepsWhite({ origin.GetFile(), origin.GetRank() + 2 });
+	Square twoStepsBlack({ origin.GetFile(), origin.GetRank() - 2 });
+	// allow two steps from start if not blocked.
+	if (Color::eWhite == m_color &&	Two == origin.GetRank() && 
+		IsVerticalClear(in_board, origin, twoStepsWhite))
+	{
+		retVal.push_back({ origin, twoStepsWhite });
+	}
+	else if (Color::eBlack == m_color && Seven == origin.GetRank() &&
+		IsVerticalClear(in_board, origin, twoStepsBlack))
+	{
+		retVal.push_back({ origin, twoStepsBlack });
+	}
+
+	//if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
+	//	board.SetQueeningMode(true); //TODO - Add queening options to legal moves
+	return retVal;
+}
+
+std::vector<Move> Bishop::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+
+	GetLegalDiagonalMoves(in_board, origin, retVal);
+
+	return retVal;
+}
+
+std::vector<Move> Knight::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+
+	std::vector<Square> options;
+	options.push_back({ origin.GetFile() + 1, origin.GetRank() + 2 });
+	options.push_back({ origin.GetFile() + 2, origin.GetRank() + 1 });
+	options.push_back({ origin.GetFile() + 1, origin.GetRank() - 2 });
+	options.push_back({ origin.GetFile() + 2, origin.GetRank() - 1 });
+	options.push_back({ origin.GetFile() - 1, origin.GetRank() + 2 });
+	options.push_back({ origin.GetFile() - 2, origin.GetRank() + 1 });
+	options.push_back({ origin.GetFile() - 1, origin.GetRank() - 2 });
+	options.push_back({ origin.GetFile() - 2, origin.GetRank() - 1 });
+
+	for (auto option : options)
+	{
+		Piece* destPiece = in_board.GetPiece(option);
+		if (!option.InBounds() || (nullptr != destPiece && destPiece->m_color == in_board.GetPiece(origin)->m_color))
+			continue;
+		retVal.push_back({ origin, option });
+	}
+
+	return retVal;
+}
+
+std::vector<Move> Rook::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+
+	GetLegalHorizontalMoves(in_board, origin, retVal);
+	GetLegalVerticalMoves(in_board, origin, retVal);
+
+	return retVal;
+}
+
+std::vector<Move> Queen::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+
+	GetLegalHorizontalMoves(in_board, origin, retVal);
+	GetLegalVerticalMoves(in_board, origin, retVal);
+	GetLegalDiagonalMoves(in_board, origin, retVal);
+
+	return retVal;
+}
+
+
+std::vector<Move> King::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal;
+	std::vector<Square> options;
+
+	Piece *myPiece = in_board.GetPiece(origin);
+	Color myColor = myPiece->m_color;
+	auto castlingFlag = in_board.GetCastlingFlag();
+
+	options.push_back({ origin.GetFile() + 1, origin.GetRank() + 1});
+	options.push_back({ origin.GetFile() + 1, origin.GetRank() });
+	options.push_back({ origin.GetFile() + 1, origin.GetRank() - 1});
+	options.push_back({ origin.GetFile(), origin.GetRank() + 1});
+	options.push_back({ origin.GetFile(), origin.GetRank() - 1});
+	options.push_back({ origin.GetFile() - 1, origin.GetRank() + 1});
+	options.push_back({ origin.GetFile() - 1, origin.GetRank() });
+	options.push_back({ origin.GetFile() - 1, origin.GetRank() - 1});
+	if (myColor == eWhite && castlingFlag[whiteShort] || myColor == eBlack && castlingFlag[blackShort])
+		options.push_back({ origin.GetFile() + 2, origin.GetRank() }); //short castle
+	if (myColor == eWhite && castlingFlag[whiteLong] || myColor == eBlack && castlingFlag[blackLong])
+		options.push_back({ origin.GetFile() - 2, origin.GetRank() }); //long castle
+
+	for (auto option = options.begin(); option != options.end();)
+	{
+		Piece* destPiece(in_board.GetPiece(*option));
+		if (!option->InBounds() || (nullptr != destPiece && destPiece->m_color == myColor))
+		{
+			option = options.erase(option);
+			continue;
+		}
+		Board dummyBoard = in_board;
+		Square currOption = *option;
+		dummyBoard.SetPiece(currOption, myPiece);
+		dummyBoard.SetPiece(origin, nullptr);
+		if (dummyBoard.CheckIsCheck())
+		{
+			option = options.erase(option);
+			continue;
+		}
+		retVal.push_back({ origin, *option });
+		++option;
+	}
+
+
 	return retVal;
 }
 

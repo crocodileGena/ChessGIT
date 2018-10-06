@@ -16,6 +16,7 @@ public:
 	virtual bool IsMoveLegal(Board &board, const Square source, const Square dest) = 0;
 	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
 	virtual bool isEnPassantMove(const Color /*in_color*/, const Square /*in_source*/, const Square /*in_dest*/) { return false; }
+	virtual std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) = 0;
 
 	int m_worth;
 	Color m_color;
@@ -35,6 +36,8 @@ public:
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
 	void OnPieceMoved(Board &board) override;
 	bool isEnPassantMove(const Color in_color, const Square in_source, const Square in_dest) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
+
 private:
 	bool m_enpassantCaptured;
 };
@@ -47,6 +50,7 @@ public:
 
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
 };
 
 class Knight : public Piece
@@ -58,6 +62,7 @@ public:
 
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
 };
 
 class Rook : public Piece
@@ -70,6 +75,7 @@ public:
 	void OnPieceMoved(Board &board) override;
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
 
 	bool m_bCastleAllowed;
 };
@@ -83,6 +89,7 @@ public:
 
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
 };
 
 class King : public Piece
@@ -99,6 +106,7 @@ public:
 	void OnPieceMoved(Board &board) override;
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
 	std::vector<Piece*> CanPieceCapture(Board &board, const Square source) override;
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
 
 	bool m_bCastleAllowed;
 private:

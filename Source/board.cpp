@@ -425,7 +425,7 @@ bool Board::CheckIsCheck()
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			Piece* currPiece = GetPiece({ i,j });
-			if (currPiece && m_lastColorMoved != currPiece->m_color)
+			if (currPiece && m_lastColorMoved == currPiece->m_color)
 			{
 				std::vector<Piece*> captures = currPiece->CanPieceCapture(*this, { i,j });
 				if (CanPieceCaptureKing(captures))

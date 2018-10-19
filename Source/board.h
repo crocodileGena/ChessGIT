@@ -105,7 +105,7 @@ public:
 	void QueenAPawn(const Square in_square, const std::string in_piece);
 	std::vector<Move> GetLegalMoves();
 
-	int m_lastColorMoved;
+	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];
 	GameNotation m_gameNotation;
 	std::string m_status;

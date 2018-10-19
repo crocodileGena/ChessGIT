@@ -114,6 +114,7 @@ public:
 	bool m_queeningMode;
 private:
 	bool CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
+	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 	Square m_enPassantSquare;
 };

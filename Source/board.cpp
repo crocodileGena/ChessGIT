@@ -271,10 +271,18 @@ bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &in
 	m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
 		isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 		enPassantDestSquare, m_halfmoveClock, checkOrMate);
-	if (!currPiece->isEnPassantMove(currPiece->m_color, inBase, inDest))
-		SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
+	UpdateEnPassantSquare(currPiece, inBase, inDest);
 
 	return retVal;
+}
+
+void Board::UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest)
+{
+	Color currColor = currPiece->m_color;
+	if (currPiece->isEnPassantMove(currPiece->m_color, inBase, inDest))
+		SetEnPassantSquare({ inBase.GetFile(), currColor == eWhite ? inBase.GetRank() + 1 : inBase.GetRank() - 1 });
+	else
+		SetEnPassantSquare({ kIllegalSquare, kIllegalSquare });
 }
 
 std::string GameNotation::GetFENFromPosition(const std::string in_position, const bool whitesMove,

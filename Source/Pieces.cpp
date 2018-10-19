@@ -439,17 +439,17 @@ std::vector<Move> Pawn::GetLegalMoves(const Board& in_board, const Square origin
 	Square rightCaptureBlack(origin.GetFile() + 1, origin.GetRank() - 1);
 
 	// allow capture if piece exists on destination.
-	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(leftCaptureWhite) &&
+	if (eWhite == m_color && nullptr != in_board.GetPiece(leftCaptureWhite) &&
 		eBlack == in_board.GetPiece(leftCaptureWhite)->m_color)
 		retVal.push_back({ origin, leftCaptureWhite });
-	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(rightCaptureWhite) &&
+	if (eWhite == m_color && nullptr != in_board.GetPiece(rightCaptureWhite) &&
 		eBlack == in_board.GetPiece(rightCaptureWhite)->m_color)
 		retVal.push_back({ origin, rightCaptureWhite });
-	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(leftCaptureBlack) &&
-		eBlack == in_board.GetPiece(leftCaptureBlack)->m_color)
+	if (eBlack == m_color && nullptr != in_board.GetPiece(leftCaptureBlack) &&
+		eWhite == in_board.GetPiece(leftCaptureBlack)->m_color)
 		retVal.push_back({ origin, leftCaptureBlack });
-	if (Color::eWhite == m_color && nullptr != in_board.GetPiece(rightCaptureBlack) &&
-		eBlack == in_board.GetPiece(rightCaptureBlack)->m_color)
+	if (eBlack == m_color && nullptr != in_board.GetPiece(rightCaptureBlack) &&
+		eWhite == in_board.GetPiece(rightCaptureBlack)->m_color)
 		retVal.push_back({ origin, rightCaptureBlack });
 
 	Square twoStepsWhite({ origin.GetFile(), origin.GetRank() + 2 });

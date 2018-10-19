@@ -154,7 +154,7 @@ bool ArePiecesInWay(Board &board, const Square source, const Square dest)
 bool Pawn::IsMoveLegal(Board &board, const Square source, const Square dest)
 {
 	bool retVal = false;
-	m_enpassantCaptured = false;
+	//m_enpassantCaptured = false;
 	// allow en passant capture
 	Square enpassantSquare = board.GetEnPassantSquare();
 	if (enpassantSquare.GetFile() != kIllegalSquare &&
@@ -166,7 +166,7 @@ bool Pawn::IsMoveLegal(Board &board, const Square source, const Square dest)
 			(enpassantSquare.GetRank() == (source.GetRank() - 1))))
 	{
 		retVal = true;
-		m_enpassantCaptured = true;
+		//m_enpassantCaptured = true;
 	}
 	// allow one straight move if not blocked.
 	if ((((Color::eWhite == m_color) &&
@@ -604,7 +604,7 @@ bool Pawn::isEnPassantMove(const Color in_color, const Square in_source, const S
 void Pawn::OnPieceMoved(Board &board)
 {
 	Square enPassantSquare = board.GetEnPassantSquare();
-	if (m_enpassantCaptured && enPassantSquare.GetFile() != kIllegalSquare)
+	if (enPassantSquare.GetFile() != kIllegalSquare && nullptr != board.GetPiece(enPassantSquare))
 	{
 		Square removeEatenPawn = enPassantSquare;
 		removeEatenPawn.SetRank(enPassantSquare.GetRank() == Six ? Five : Four);

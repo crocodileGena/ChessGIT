@@ -26,7 +26,7 @@ public:
 class Pawn : public Piece
 {
 public:
-	Pawn(const Color in_color) : Piece(in_color), m_enpassantCaptured(false)
+	Pawn(const Color in_color) : Piece(in_color)
 	{ 
 		m_worth = Worth::ePawn; m_name = "P";
 	}
@@ -37,9 +37,6 @@ public:
 	void OnPieceMoved(Board &board) override;
 	bool isEnPassantMove(const Color in_color, const Square in_source, const Square in_dest) override;
 	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin) override;
-
-private:
-	bool m_enpassantCaptured;
 };
 
 class Bishop : public Piece

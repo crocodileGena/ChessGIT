@@ -574,14 +574,17 @@ std::vector<Move> King::GetLegalMovesSelf(const Board& in_board, const Square or
 	Square shortCastleOption = { origin.GetFile() + 2, origin.GetRank() };
 	Square longCastleOption = { origin.GetFile() - 2, origin.GetRank() };
 
-	if (myColor == eWhite && castlingFlag[whiteShort] && IsHorizontalClear(in_board, origin, { H, One }))
-		options.push_back(shortCastleOption); //short white castle
-	if (myColor == eBlack && castlingFlag[blackShort] && IsHorizontalClear(in_board, origin, { H, Eight }))
-		options.push_back(shortCastleOption); //short black castle
-	if (myColor == eWhite && castlingFlag[whiteLong] && IsHorizontalClear(in_board, origin, { A, One }))
-		options.push_back(longCastleOption); //long white castle
-	if (myColor == eBlack && castlingFlag[blackLong] && IsHorizontalClear(in_board, origin, { A, Eight }))
-		options.push_back(longCastleOption); //long black castle
+	if (in_board.GetCheckOrMate() == eNone)
+	{
+		if (myColor == eWhite && castlingFlag[whiteShort] && IsHorizontalClear(in_board, origin, { H, One }))
+			options.push_back(shortCastleOption); //short white castle
+		if (myColor == eBlack && castlingFlag[blackShort] && IsHorizontalClear(in_board, origin, { H, Eight }))
+			options.push_back(shortCastleOption); //short black castle
+		if (myColor == eWhite && castlingFlag[whiteLong] && IsHorizontalClear(in_board, origin, { A, One }))
+			options.push_back(longCastleOption); //long white castle
+		if (myColor == eBlack && castlingFlag[blackLong] && IsHorizontalClear(in_board, origin, { A, Eight }))
+			options.push_back(longCastleOption); //long black castle
+	}
 
 	for (auto option = options.begin(); option != options.end();)
 	{

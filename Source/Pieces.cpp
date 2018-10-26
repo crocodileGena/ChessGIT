@@ -570,14 +570,18 @@ std::vector<Move> King::GetLegalMovesSelf(const Board& in_board, const Square or
 	options.push_back({ origin.GetFile() - 1, origin.GetRank() + 1});
 	options.push_back({ origin.GetFile() - 1, origin.GetRank() });
 	options.push_back({ origin.GetFile() - 1, origin.GetRank() - 1});
+
+	Square shortCastleOption = { origin.GetFile() + 2, origin.GetRank() };
+	Square longCastleOption = { origin.GetFile() - 2, origin.GetRank() };
+
 	if (myColor == eWhite && castlingFlag[whiteShort] && IsHorizontalClear(in_board, origin, { H, One }))
-		options.push_back({ origin.GetFile() + 2, origin.GetRank() }); //short white castle
+		options.push_back(shortCastleOption); //short white castle
 	if (myColor == eBlack && castlingFlag[blackShort] && IsHorizontalClear(in_board, origin, { H, Eight }))
-		options.push_back({ origin.GetFile() + 2, origin.GetRank() }); //short black castle
+		options.push_back(shortCastleOption); //short black castle
 	if (myColor == eWhite && castlingFlag[whiteLong] && IsHorizontalClear(in_board, origin, { A, One }))
-		options.push_back({ origin.GetFile() - 2, origin.GetRank() }); //long white castle
+		options.push_back(longCastleOption); //long white castle
 	if (myColor == eBlack && castlingFlag[blackLong] && IsHorizontalClear(in_board, origin, { A, Eight }))
-		options.push_back({ origin.GetFile() - 2, origin.GetRank() }); //long black castle
+		options.push_back(longCastleOption); //long black castle
 
 	for (auto option = options.begin(); option != options.end();)
 	{
@@ -587,14 +591,33 @@ std::vector<Move> King::GetLegalMovesSelf(const Board& in_board, const Square or
 			option = options.erase(option);
 			continue;
 		}
-		Board dummyBoard = in_board;
-		Square currOption = *option;
-		dummyBoard.SetPiece(currOption, myPiece);
-		dummyBoard.SetPiece(origin, nullptr);
-		if (dummyBoard.CheckIsCheck())
+
+		if (*option == longCastleOption)
 		{
-			option = options.erase(option);
-			continue;
+			Board dummyBoard = in_board;
+			longCastleOption.SetFile(D);
+			dummyBoard.m_lastColorMoved = dummyBoard.m_lastColorMoved == eWhite ? eBlack : eWhite;
+			dummyBoard.SetPiece(longCastleOption, myPiece);
+			dummyBoard.SetPiece(origin, nullptr);
+			if (dummyBoard.CheckIsCheck())
+			{
+				option = options.erase(option);
+				continue;
+			}
+		}
+
+		if (*option == shortCastleOption)
+		{
+			Board dummyBoard = in_board;
+			shortCastleOption.SetFile(F);
+			dummyBoard.m_lastColorMoved = dummyBoard.m_lastColorMoved == eWhite ? eBlack : eWhite;
+			dummyBoard.SetPiece(shortCastleOption, myPiece);
+			dummyBoard.SetPiece(origin, nullptr);
+			if (dummyBoard.CheckIsCheck())
+			{
+				option = options.erase(option);
+				continue;
+			}
 		}
 		retVal.push_back({ origin, *option });
 		++option;

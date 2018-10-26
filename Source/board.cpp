@@ -461,7 +461,7 @@ std::vector<Move> Board::GetLegalMoves(Color for_which_color)
 
 void Board::RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const
 {
-	//if (GetCheckOrMate() == eCheck)
+	//if (GetCheckOrMate() == eCheck) TODO: Optimization. See if this can be put back
 	{
 		for (auto option = legalMoves.begin(); option != legalMoves.end();)
 		{

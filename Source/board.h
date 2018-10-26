@@ -102,7 +102,7 @@ public:
 	const bool* GetCastlingFlag() const { return m_castlingFlag; }
 	bool GetQueeningMode() { return m_queeningMode; }
 	std::string GetPiecesPosition();
-	std::vector<Move> GetLegalMoves();
+	std::vector<Move> GetLegalMoves(Color for_which_color);
 
 	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
@@ -121,7 +121,7 @@ public:
 	int m_halfmoveClock;
 	bool m_queeningMode;
 private:
-	bool CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
+	void CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
 	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 	Square m_enPassantSquare;

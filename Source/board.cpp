@@ -230,55 +230,47 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 		Move myMove(inBase, inDest);
 		if (m_lastColorMoved == currPiece->m_color)
 			m_status = "Same color ";
-		//else if (currPiece->IsMoveLegal(*this, inBase, inDest))
 		else if (legalMoves.end() != std::find(legalMoves.begin(), legalMoves.end(), myMove))
 		{
-			isPieceMoved = CommitMove(currPiece, inBase, inDest);
+			// Prepare parameters
+			const Square enPassantDestSquare = GetEnPassantSquare();
+			const bool isCapture = GetPiece(inDest) != nullptr || enPassantDestSquare == inDest;
+			const bool specifyRank = false; //TODO : Implement this
+			const bool specifyFile = false; //ToDO : Implement this
+			const bool whitesMove = currPiece->m_color == eBlack;
+			const bool* castlingOptions = GetCastlingFlag();
+
+			isPieceMoved = true;
+			CommitMove(currPiece, inBase, inDest);
+
+			if (CheckIsCheck())
+			{
+				SetCheckOrMate(CheckIsMate() ? eMate : eCheck);
+			}
+			else
+				SetCheckOrMate(eNone);
+
+			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
+			UpdateCastlingFlag(currPiece, inBase);
+			m_lastColorMoved = currPiece->m_color;
+			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
+				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
+				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
+			UpdateEnPassantSquare(currPiece, inBase, inDest);
 		}
 	}
 	if (!isPieceMoved)
 		std::cout << "Illegal Move\n";
-	//else
-		//CheckIsCheck();
 
 	return isPieceMoved;
 }
 
-bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
+void Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
 {
-	bool retVal = true;
-
-	// Prepare parameters
-	const Square enPassantDestSquare = GetEnPassantSquare();
-	const bool isCapture = GetPiece(inDest) != nullptr || enPassantDestSquare == inDest;
-	const bool specifyRank = false; //TODO : Implement this
-	const bool specifyFile = false; //ToDO : Implement this
-	const bool whitesMove = currPiece->m_color == eBlack;
-	const bool* castlingOptions = GetCastlingFlag();
-
 	// Make the move
 	SetPiece(inBase, nullptr);
 	SetPiece(inDest, currPiece);
 	currPiece->OnPieceMoved(*this); // update other affected pieces
-
-	// Update everything accordignly
-	if (CheckIsCheck())
-	{
-		SetCheckOrMate(eCheck);
-		//checkOrMate = CheckIsMate() ? eMate : eCheck;
-	}
-	else
-		SetCheckOrMate(eNone);
-
-	UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
-	UpdateCastlingFlag(currPiece, inBase);
-	m_lastColorMoved = currPiece->m_color;
-	m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
-		isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-		enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
-	UpdateEnPassantSquare(currPiece, inBase, inDest);
-
-	return retVal;
 }
 
 void Board::UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest)
@@ -445,16 +437,20 @@ bool Board::CheckIsCheck()
 	return retVal;
 }
 
-std::vector<Move> Board::GetLegalMoves()
+std::vector<Move> Board::GetLegalMoves(Color for_which_color)
 {
 	std::vector<Move> retVal;
+
+	Board dummyBoard = *this;
+	dummyBoard.m_lastColorMoved = for_which_color == eWhite ? eBlack: eWhite;
+
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
 		{
-			Piece* currPiece = GetPiece({ i,j });
-			if (currPiece && currPiece->m_color != m_lastColorMoved)
+			Piece* currPiece = dummyBoard.GetPiece({ i,j });
+			if (currPiece && currPiece->m_color == for_which_color)
 			{
-				std::vector<Move> pieceMoves = currPiece->GetLegalMoves(*this, { i, j });
+				std::vector<Move> pieceMoves = currPiece->GetLegalMoves(dummyBoard, { i, j });
 				retVal.insert(retVal.end(), pieceMoves.begin(), pieceMoves.end());
 			}
 
@@ -472,6 +468,7 @@ void Board::RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const
 			Board dummyBoard = *this;
 			Piece* currPiece = dummyBoard.GetPiece(option->m_origin);
 			dummyBoard.CommitMove(currPiece, option->m_origin, option->m_dest);
+			dummyBoard.m_lastColorMoved = dummyBoard.m_lastColorMoved == eWhite ? eBlack : eWhite;
 			if (dummyBoard.CheckIsCheck())
 			{
 				option = legalMoves.erase(option);
@@ -489,18 +486,12 @@ bool Square::InBounds() const
 
 bool Board::CheckIsMate()
 {
-	bool retVal = true;
-	std::vector<Move> legalMoves = GetLegalMoves();
-	// loop over all legal moves, if found 1 move that isn't still in check, return false
-	for (auto move : legalMoves)
-	{
-		//Board dummy(*this);
-		//if (!dummy.CheckIsCheck())
-		//{
-		//	retVal = false;
-		//	break;
-		//}
-	}
+	bool retVal = false;
+	Color for_which_color = m_lastColorMoved;
+	std::vector<Move> legalMoves = GetLegalMoves(for_which_color);
+	
+	if (legalMoves.empty())
+		retVal = true;
 
 	return retVal;
 }

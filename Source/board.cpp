@@ -10,7 +10,8 @@ m_halfmoveClock(in_board.m_halfmoveClock),
 m_status(in_board.m_status),
 m_queeningMode(in_board.m_queeningMode),
 m_enPassantSquare(in_board.m_enPassantSquare),
-m_gameNotation(in_board.m_gameNotation)
+m_gameNotation(in_board.m_gameNotation),
+m_checkOrMate(in_board.m_checkOrMate)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -45,11 +46,13 @@ void Board::PrintPiecesSum()
 		<< blackSum << ". Overall: " << sign
 		<< overall << std::endl;
 }
+
 Board::Board() : 
 m_lastColorMoved(eBlack), 
 m_status("status bar"),
 m_halfmoveClock(0),
-m_queeningMode(false)
+m_queeningMode(false),
+m_checkOrMate(eNone)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -223,7 +226,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	auto currPiece = GetPiece(inBase);
 	if (!GetQueeningMode() && currPiece && inBase.InBounds() && inDest.InBounds())
 	{
-		auto legalMoves = GetLegalMoves();
+		auto legalMoves = currPiece->GetLegalMoves(*this, inBase);
 		Move myMove(inBase, inDest);
 		if (m_lastColorMoved == currPiece->m_color)
 			m_status = "Same color ";
@@ -244,7 +247,6 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
 {
 	bool retVal = true;
-	CheckOrMate checkOrMate = eNone;
 
 	// Prepare parameters
 	const Square enPassantDestSquare = GetEnPassantSquare();
@@ -262,15 +264,18 @@ bool Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &in
 	// Update everything accordignly
 	if (CheckIsCheck())
 	{
+		SetCheckOrMate(eCheck);
 		//checkOrMate = CheckIsMate() ? eMate : eCheck;
 	}
+	else
+		SetCheckOrMate(eNone);
 
 	UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 	UpdateCastlingFlag(currPiece, inBase);
 	m_lastColorMoved = currPiece->m_color;
 	m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
 		isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-		enPassantDestSquare, m_halfmoveClock, checkOrMate);
+		enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 	UpdateEnPassantSquare(currPiece, inBase, inDest);
 
 	return retVal;
@@ -378,7 +383,7 @@ void GameNotation::PushMove(const std::string &in_piecesPosition, const std::str
 	m_vNotation.push_back(newNode);
 }
 
-std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate)
+std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool /*specifyRank*/, const bool /*specifyFile*/, CheckOrMate checkOrMate)
 {
 	std::string retVal;
 	retVal += pieceName == "P" ? "" : pieceName;
@@ -425,7 +430,7 @@ bool Board::CheckIsCheck()
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			Piece* currPiece = GetPiece({ i,j });
-			if (currPiece && m_lastColorMoved == currPiece->m_color)
+			if (currPiece && m_lastColorMoved != currPiece->m_color)
 			{
 				std::vector<Piece*> captures = currPiece->CanPieceCapture(*this, { i,j });
 				if (CanPieceCaptureKing(captures))
@@ -454,7 +459,27 @@ std::vector<Move> Board::GetLegalMoves()
 			}
 
 		}
+
 	return retVal;
+}
+
+void Board::RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const
+{
+	//if (GetCheckOrMate() == eCheck)
+	{
+		for (auto option = legalMoves.begin(); option != legalMoves.end();)
+		{
+			Board dummyBoard = *this;
+			Piece* currPiece = dummyBoard.GetPiece(option->m_origin);
+			dummyBoard.CommitMove(currPiece, option->m_origin, option->m_dest);
+			if (dummyBoard.CheckIsCheck())
+			{
+				option = legalMoves.erase(option);
+				continue;
+			}
+			++option;
+		}
+	}
 }
 
 bool Square::InBounds() const

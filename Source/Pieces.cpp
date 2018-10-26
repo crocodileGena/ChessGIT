@@ -2,6 +2,14 @@
 #include "Pieces.h"
 #include <stdlib.h>
 
+std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin)
+{
+	std::vector<Move> retVal = GetLegalMovesSelf(in_board, origin);
+	in_board.RemoveUndefendedCheckMoves(retVal);
+
+	return retVal;
+}
+
 void RecursiveCheckCaptures(Board &board, Square source, int xDirection, int yDirection, std::vector<Piece*>& outCaptures, Color canCaptureColor)
 {
 	Square dest({ source.GetFile() + xDirection, source.GetRank() + yDirection });
@@ -426,7 +434,7 @@ std::vector<Piece*> Rook::CanPieceCapture(Board &board, const Square source)
 	return retVal;
 }
 
-std::vector<Move> Pawn::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Pawn::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 	// allow en passant capture
@@ -482,12 +490,14 @@ std::vector<Move> Pawn::GetLegalMoves(const Board& in_board, const Square origin
 		retVal.push_back({ origin, twoStepsBlack });
 	}
 
+	if (in_board.GetCheckOrMate() == eCheck)
+		in_board.RemoveUndefendedCheckMoves(retVal);
 	//if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
 	//	board.SetQueeningMode(true); //TODO - Add queening options to legal moves
 	return retVal;
 }
 
-std::vector<Move> Bishop::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Bishop::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 
@@ -496,7 +506,7 @@ std::vector<Move> Bishop::GetLegalMoves(const Board& in_board, const Square orig
 	return retVal;
 }
 
-std::vector<Move> Knight::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Knight::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 
@@ -521,7 +531,7 @@ std::vector<Move> Knight::GetLegalMoves(const Board& in_board, const Square orig
 	return retVal;
 }
 
-std::vector<Move> Rook::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Rook::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 
@@ -531,7 +541,7 @@ std::vector<Move> Rook::GetLegalMoves(const Board& in_board, const Square origin
 	return retVal;
 }
 
-std::vector<Move> Queen::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Queen::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 
@@ -543,7 +553,7 @@ std::vector<Move> Queen::GetLegalMoves(const Board& in_board, const Square origi
 }
 
 
-std::vector<Move> King::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> King::GetLegalMovesSelf(const Board& in_board, const Square origin)
 {
 	std::vector<Move> retVal;
 	std::vector<Square> options;

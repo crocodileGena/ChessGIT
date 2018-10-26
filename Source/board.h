@@ -87,23 +87,31 @@ public:
 
 	void PrintBoard();
 	void ResetBoard();
+	void PrintPiecesSum();
+	
 	bool MovePiece(const Square inBase, const Square inDest);
 	Piece* GetPiece(const Square inLocation) const;
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
-	void PrintPiecesSum();
+	
 	bool CheckIsCheck();
 	bool CheckIsMate();
+	
 	std::string GetStatus() { return m_status; }
-	std::string GetPiecesPosition();
-	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);
-	const bool* GetCastlingFlag() const { return m_castlingFlag; }
+	CheckOrMate GetCheckOrMate() const { return m_checkOrMate; }
 	Square GetEnPassantSquare() const { return m_enPassantSquare; }
-	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
-	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
+	const bool* GetCastlingFlag() const { return m_castlingFlag; }
 	bool GetQueeningMode() { return m_queeningMode; }
-	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
-	void QueenAPawn(const Square in_square, const std::string in_piece);
+	std::string GetPiecesPosition();
 	std::vector<Move> GetLegalMoves();
+
+	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
+	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
+	void SetCheckOrMate(CheckOrMate in_checkormate) { m_checkOrMate = in_checkormate; }
+
+	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);
+	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
+	void QueenAPawn(const Square in_square, const std::string in_piece);
+	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 
 	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];
@@ -117,4 +125,5 @@ private:
 	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 	Square m_enPassantSquare;
+	CheckOrMate m_checkOrMate;
 };

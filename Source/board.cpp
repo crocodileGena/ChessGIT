@@ -378,17 +378,24 @@ void GameNotation::PushMove(const std::string &in_piecesPosition, const std::str
 std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool /*specifyRank*/, const bool /*specifyFile*/, CheckOrMate checkOrMate)
 {
 	std::string retVal;
-	retVal += pieceName == "P" ? "" : pieceName;
-	if (pieceName == "P" && isCapture)
-		retVal += char(in_origin.GetFile() + 'a');
-	retVal += isCapture ? "x" : "";
-	retVal += char(in_dest.GetFile() + 'a');
-	retVal += char(in_dest.GetRank() + '1');
-	if (checkOrMate == eCheck)
-		retVal += "+";
-	else if (checkOrMate == eMate)
-		retVal += "#";
-
+	
+	if (pieceName == "K" && in_dest.GetFile() == G && in_origin.GetFile() == E)
+		retVal = "O-O";
+	else if (pieceName == "K" && in_dest.GetFile() == C && in_origin.GetFile() == E)
+		retVal = "O-O-O";
+	else
+	{
+		retVal += pieceName == "P" ? "" : pieceName;
+		if (pieceName == "P" && isCapture)
+			retVal += char(in_origin.GetFile() + 'a');
+		retVal += isCapture ? "x" : "";
+		retVal += char(in_dest.GetFile() + 'a');
+		retVal += char(in_dest.GetRank() + '1');
+		if (checkOrMate == eCheck)
+			retVal += "+";
+		else if (checkOrMate == eMate)
+			retVal += "#";
+	}
 	return retVal;
 }
 

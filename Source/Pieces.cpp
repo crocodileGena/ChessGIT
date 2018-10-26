@@ -480,12 +480,12 @@ std::vector<Move> Pawn::GetLegalMovesSelf(const Board& in_board, const Square or
 	Square twoStepsBlack({ origin.GetFile(), origin.GetRank() - 2 });
 	// allow two steps from start if not blocked.
 	if (Color::eWhite == m_color &&	Two == origin.GetRank() && 
-		IsVerticalClear(in_board, origin, twoStepsWhite))
+		IsVerticalClear(in_board, origin, twoStepsWhite) && nullptr == in_board.GetPiece(twoStepsWhite))
 	{
 		retVal.push_back({ origin, twoStepsWhite });
 	}
 	else if (Color::eBlack == m_color && Seven == origin.GetRank() &&
-		IsVerticalClear(in_board, origin, twoStepsBlack))
+		IsVerticalClear(in_board, origin, twoStepsBlack) && nullptr == in_board.GetPiece(twoStepsBlack))
 	{
 		retVal.push_back({ origin, twoStepsBlack });
 	}

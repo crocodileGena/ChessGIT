@@ -23,10 +23,10 @@ m_checkOrMate(in_board.m_checkOrMate)
 		m_castlingFlag[i] = in_board.GetCastlingFlag()[i];
 }
 
-void Board::PrintPiecesSum()
+void Board::PiecesSum(int& whiteSum, int& blackSum)
 {
-	int blackSum = 0;
-	int whiteSum = 0;
+	int temp_blackSum = 0;
+	int temp_whiteSum = 0;
 
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -40,11 +40,8 @@ void Board::PrintPiecesSum()
 				blackSum += currPiece->m_worth;
 		}
 
-	int overall = whiteSum - blackSum;
-	char* sign = overall < 0 ? "-" : "+";
-	std::cout << "White: " << whiteSum << ". Black : " 
-		<< blackSum << ". Overall: " << sign
-		<< overall << std::endl;
+	whiteSum = temp_whiteSum;
+	blackSum = temp_blackSum;
 }
 
 Board::Board() : 
@@ -285,14 +282,59 @@ CheckOrMate Board::DeriveCheckOrMate(const std::string piecesPosition)
 
 	if (CheckIsCheck())
 		retVal = noLegalMoves ? eMate : eCheck;
-	else
-		retVal = noLegalMoves ? eDraw : eNone;
 
-	if (m_halfmoveClock > 100 || m_gameNotation.IsPerpetual(piecesPosition, m_lastColorMoved == eBlack))
+	if (retVal == eNone && IsADraw(noLegalMoves, piecesPosition))
 		retVal = eDraw;
 
 	return retVal;
 }
+
+bool Board::IsADraw(const bool noLegalMoves, const std::string piecesPosition)
+{
+	bool retVal = false;
+
+	if (noLegalMoves || m_halfmoveClock > 100 ||
+		m_gameNotation.IsPerpetual(piecesPosition, m_lastColorMoved == eBlack))
+		retVal = true;
+	else
+	{
+		int whiteSum(0), blackSum(0);
+		PiecesSum(whiteSum, blackSum);
+		int combined = whiteSum + blackSum;
+		if (combined == 0 || combined == 3)
+			retVal = true;
+		else if (combined == 6)
+		{
+			//must be two pieces
+			std::vector<Piece*> leftPieces = GetPieces();
+			std::string firstPiece = leftPieces.at(0)->m_name;
+			std::string secondPiece = leftPieces.at(1)->m_name;
+			Color firstPieceColor = leftPieces.at(0)->m_color;
+			Color secondPieceColor = leftPieces.at(1)->m_color;
+			if (firstPiece.compare("B") == std::string::npos && secondPiece.compare("B") == std::string::npos &&
+				firstPieceColor == secondPieceColor)
+				retVal = true;
+		}
+
+	}
+
+	return retVal;
+}
+
+std::vector<Piece*> Board::GetPieces()
+{
+	std::vector<Piece*> retVal;
+	for (int i = 0; i < BoardSize; ++i)
+	{
+		for (int j = 0; j < BoardSize; ++j)
+		{
+			Piece* currPiece = GetPiece({ i,j });
+			retVal.push_back(currPiece);
+		}
+	}
+	return retVal;
+}
+
 void Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
 {
 	// Make the move

@@ -91,11 +91,12 @@ public:
 
 	void PrintBoard();
 	void ResetBoard();
-	void PrintPiecesSum();
+	void PiecesSum(int& whiteSum, int& blackSum);
 	
 	bool MovePiece(const Square inBase, const Square inDest);
 	Piece* GetPiece(const Square inLocation) const;
 	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
+	std::vector<Piece*> GetPieces();
 	
 	bool CheckIsCheck();
 	bool CheckIsMate();
@@ -117,6 +118,7 @@ public:
 	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
 	void QueenAPawn(const Square in_square, const std::string in_piece);
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
+	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
 
 	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];

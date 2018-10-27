@@ -224,7 +224,9 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 {
 	bool isPieceMoved = false;
 	auto currPiece = GetPiece(inBase);
-	if (!GetQueeningMode() && currPiece && inBase.InBounds() && inDest.InBounds())
+	auto checkOrMate = GetCheckOrMate();
+	if (!GetQueeningMode() && currPiece && inBase.InBounds() && inDest.InBounds() &&
+		checkOrMate != eMate && checkOrMate != eDraw)
 	{
 		auto legalMoves = currPiece->GetLegalMoves(*this, inBase);
 		Move myMove(inBase, inDest);
@@ -255,11 +257,12 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
 
+			const std::string piecesPosition = GetPiecesPosition();
 			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
-			SetCheckOrMate(DeriveCheckOrMate());
+			SetCheckOrMate(DeriveCheckOrMate(piecesPosition));
 			UpdateCastlingFlag(currPiece, inBase);
 			m_lastColorMoved = currPiece->m_color;
-			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
+			m_gameNotation.PushMove(piecesPosition, currPiece->m_name, inBase, inDest,
 				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 			UpdateEnPassantSquare(currPiece, inBase, inDest);
@@ -271,13 +274,12 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	return isPieceMoved;
 }
 
-CheckOrMate Board::DeriveCheckOrMate()
+CheckOrMate Board::DeriveCheckOrMate(const std::string piecesPosition)
 {
 	CheckOrMate retVal = eNone;
 
 	bool noLegalMoves = false;
-	Color for_which_color = m_lastColorMoved;
-	std::vector<Move> legalMoves = GetLegalMoves(for_which_color);
+	std::vector<Move> legalMoves = GetLegalMoves(m_lastColorMoved);
 	if (legalMoves.empty())
 		noLegalMoves = true;
 
@@ -286,7 +288,7 @@ CheckOrMate Board::DeriveCheckOrMate()
 	else
 		retVal = noLegalMoves ? eDraw : eNone;
 
-	if (m_halfmoveClock > 100)
+	if (m_halfmoveClock > 100 || m_gameNotation.IsPerpetual(piecesPosition, m_lastColorMoved == eBlack))
 		retVal = eDraw;
 
 	return retVal;
@@ -397,7 +399,7 @@ void GameNotation::PushMove(const std::string &in_piecesPosition, const std::str
 {
 	std::string fen = GetFENFromPosition(in_piecesPosition, whitesMove, castlingOptions, enPassant, halfmoveClock);
 	std::string algebraic = GetAlgebraic(pieceName, in_origin, in_dest, isCapture, specifyRank, specifyFile, checkOrMate);
-	NotationNode newNode(algebraic, fen);
+	NotationNode newNode(algebraic, fen, in_piecesPosition);
 	m_vNotation.push_back(newNode);
 }
 
@@ -431,6 +433,24 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 	return retVal;
 }
 
+bool GameNotation::IsPerpetual(const std::string &in_piecesPosition, const bool didWhiteJustMove)
+{
+	bool retVal(false);
+
+	int numOfRepetitions = 0;
+	for (auto notationNode : m_vNotation)
+	{
+		const bool isWhiteMove = notationNode.GetFEN().find('w') == std::string::npos;
+
+		if (in_piecesPosition.compare(notationNode.GetPosition()) == 0 && didWhiteJustMove == isWhiteMove)
+			++numOfRepetitions;
+	}
+
+	if (numOfRepetitions >= 2)
+		retVal = true;
+
+	return retVal;
+}
 //void GameNotation::PrintNotation()
 //{
 //	std::for_each(m_vNotation.begin(), m_vNotation.end(), [](NotationNode currNode) {currNode.Print(); });

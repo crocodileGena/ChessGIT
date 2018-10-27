@@ -4,9 +4,13 @@
 
 std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin)
 {
-	std::vector<Move> retVal = GetLegalMovesSelf(in_board, origin);
-	in_board.RemoveUndefendedCheckMoves(retVal);
-
+	auto checkOrMate = in_board.GetCheckOrMate();
+	std::vector<Move> retVal;
+	if (checkOrMate == eNone || checkOrMate == eCheck)
+	{
+		retVal = GetLegalMovesSelf(in_board, origin);
+		in_board.RemoveUndefendedCheckMoves(retVal);
+	}
 	return retVal;
 }
 

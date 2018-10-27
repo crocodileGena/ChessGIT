@@ -42,16 +42,18 @@ struct Move
 class NotationNode
 {
 public:
-	NotationNode(const std::string in_algebraic, const std::string in_fen) : 
-		m_algebraic(in_algebraic), m_fen(in_fen) {}
+	NotationNode(const std::string in_algebraic, const std::string in_fen, const std::string in_position) : 
+		m_algebraic(in_algebraic), m_fen(in_fen), m_position(in_position) {}
 	~NotationNode() {}
 
 	std::string GetAlgebraic() { return m_algebraic; }
 	std::string GetFEN() { return m_fen; }
+	std::string GetPosition() { return m_position; }
 
 private:
 	std::string m_algebraic;	//move
 	std::string m_fen;			//state
+	std::string m_position;		//first part of fen
 };
 
 class GameNotation
@@ -67,6 +69,7 @@ public:
 					const bool isCapture, const bool specifyRank, const bool specifyFile,
 					const bool whitesMove, const bool* castlingOptions, const Square enPassant, const int halfmoveClock, CheckOrMate checkOrMate);
 	NotationNode GetLastNode() { return m_vNotation.back(); }
+	bool IsPerpetual(const std::string &in_piecesPosition, const bool whitesMove);
 
 private:
 	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate);
@@ -96,7 +99,7 @@ public:
 	
 	bool CheckIsCheck();
 	bool CheckIsMate();
-	CheckOrMate DeriveCheckOrMate();
+	CheckOrMate DeriveCheckOrMate(const std::string piecesPosition);
 
 	std::string GetStatus() { return m_status; }
 	CheckOrMate GetCheckOrMate() const { return m_checkOrMate; }
@@ -126,6 +129,7 @@ private:
 	void CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
 	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
+
 	Square m_enPassantSquare;
 	CheckOrMate m_checkOrMate;
 };

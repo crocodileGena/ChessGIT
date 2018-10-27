@@ -35,9 +35,9 @@ void Board::PiecesSum(int& whiteSum, int& blackSum)
 			if (!currPiece)
 				continue;
 			if (eWhite == currPiece->m_color)
-				whiteSum += currPiece->m_worth;
+				temp_whiteSum += currPiece->m_worth;
 			else
-				blackSum += currPiece->m_worth;
+				temp_blackSum += currPiece->m_worth;
 		}
 
 	whiteSum = temp_whiteSum;
@@ -67,6 +67,7 @@ void Board::ResetBoard()
 	m_status = "status bar";
 	m_halfmoveClock = 0;
 	m_gameNotation.Reset();
+	SetCheckOrMate(eNone);
 
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;

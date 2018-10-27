@@ -70,6 +70,7 @@ public:
 					const bool whitesMove, const bool* castlingOptions, const Square enPassant, const int halfmoveClock, CheckOrMate checkOrMate);
 	NotationNode GetLastNode() { return m_vNotation.back(); }
 	bool IsPerpetual(const std::string &in_piecesPosition, const bool whitesMove);
+	void ParseFEN(const std::string& in_fen, std::string& position, bool* castlingOptions, Square& enPassantDestSquare, int& halfMoveClock, bool& whitesMove);
 
 private:
 	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate);
@@ -119,6 +120,7 @@ public:
 	void QueenAPawn(const Square in_square, const std::string in_piece);
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
+	void LoadFEN(const std::string in_position);
 
 	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];

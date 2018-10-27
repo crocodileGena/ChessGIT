@@ -141,6 +141,22 @@ void Board::PrintBoard()
 
 }
 
+void Board::LoadFEN(const std::string in_fen)
+{
+	ResetBoard();
+
+	std::string position;
+	bool* castlingOptions = new bool[4];
+	Square enPassantDestSquare;
+	int halfMoveClock;
+	bool whitesMove;
+
+	//currPiece->m_name, inBase, inDest,
+	//	isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
+	//	enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
+	m_gameNotation.ParseFEN(in_fen, position, castlingOptions, enPassantDestSquare, halfMoveClock, whitesMove);
+}
+
 std::string Board::GetPiecesPosition()
 {
 	std::string retVal;
@@ -405,6 +421,65 @@ void GameNotation::GetCastlingString(const bool* in_options, std::string &retVal
 		retVal += "-";
 
 }
+
+void GameNotation::ParseFEN(const std::string& in_fen, std::string& position, bool* castlingOptions, Square& enPassantDestSquare, int& halfMoveClock, bool& whitesMove)
+{
+	//translate position
+	auto firstSpace = in_fen.find_first_of(' ');
+	std::string fen_position = in_fen.substr(0, firstSpace);
+	for (auto currChar : fen_position)
+	{
+		if (isdigit(currChar))
+		{
+			int number = (int)currChar - (int)'0';
+			for (int l = 0; l < number; ++l)
+				position += '-';
+		}
+		else if (currChar != '/')
+			position += currChar;
+	}
+	//write white's turn
+	whitesMove = in_fen.find('w') == std::string::npos ? false : true;
+	// write castling options
+	auto secondSpace = in_fen.find_first_of(' ', firstSpace + 1);
+	auto thirdSpace = in_fen.find_first_of(' ', secondSpace + 1);
+	const std::string castling_fen = in_fen.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
+	for (auto currChar : castling_fen)
+	{
+		if (currChar == '-')
+		{
+			for (int i = 0; i < numCastlingOptions; ++i)
+				castlingOptions[i] = false;
+		}
+		else if (currChar == 'K')
+			castlingOptions[whiteShort];
+		else if (currChar == 'Q')
+			castlingOptions[whiteLong];
+		else if (currChar == 'k')
+			castlingOptions[blackShort];
+		else if (currChar == 'q')
+			castlingOptions[blackLong];
+	}
+	//write enPassant
+	auto fourthSpace = in_fen.find_first_of(' ', thirdSpace + 1);
+	const std::string enpassant_fen = in_fen.substr(thirdSpace + 1, fourthSpace - thirdSpace - 1);
+	for (auto currChar : enpassant_fen)
+	{
+		if (currChar == '-')
+			break;
+		else if (isdigit(currChar))
+			enPassantDestSquare.SetRank((int)currChar - '1');
+		else
+			enPassantDestSquare.SetFile((int)currChar - 'a');
+	}
+	//write halfmove
+	auto fifthSpace = in_fen.find_first_of(' ', fourthSpace + 1);
+	const std::string halfMove = in_fen.substr(fourthSpace + 1, fifthSpace - fourthSpace - 1);
+	halfMoveClock = std::stoi(halfMove);
+
+	return;
+}
+
 void GameNotation::PositionToString(const std::string &in_position, std::string &retVal)
 {
 	int emptyCounter(0);

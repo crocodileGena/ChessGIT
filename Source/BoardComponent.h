@@ -32,6 +32,7 @@ public:
 		fen(in_fen), algebraic(in_algebraic) {
 		setName(in_algebraic);
 	}
+	void mouseDown(const MouseEvent &event) override;
 	void paint(Graphics& g) override;
 private:
 	std::string fen;
@@ -66,6 +67,7 @@ public:
 	void paint(Graphics& g) override;
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { movesComponent.Reset(); resized(); }
+	Board* GetBoard() { return myBoard; }
 private:
 	Board* myBoard;
 	TextButton start;

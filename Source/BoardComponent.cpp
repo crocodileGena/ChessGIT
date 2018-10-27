@@ -265,6 +265,14 @@ void ResetButton::mouseDown(const MouseEvent &event)
 	Button::mouseDown(event);
 }
 
+void BoardStateButton::mouseDown(const MouseEvent &event)
+{
+	auto myGrandParentComponent = findParentComponentOfClass <NotationComponent>();
+	myGrandParentComponent->GetBoard()->LoadFEN(fen);
+
+	Button::mouseDown(event);
+}
+
 void ResetButton::paint(Graphics& g)
 {
 	g.setColour(Colours::white);

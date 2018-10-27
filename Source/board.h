@@ -34,6 +34,7 @@ struct Move
 	Move() : m_origin({ kIllegalSquare, kIllegalSquare }), m_dest({ kIllegalSquare, kIllegalSquare }) {}
 	Move(const Square in_origin, const Square in_dest) : m_origin(in_origin), m_dest(in_dest) {}
 	bool Move::operator==(const Move &other) const { return (m_origin == other.m_origin && m_dest == other.m_dest); }
+	bool Move::operator!=(const Move &other) const { return *this == other ? false : true; }
 
 	Square m_origin;
 	Square m_dest;

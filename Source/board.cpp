@@ -235,10 +235,22 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			// Prepare parameters
 			const Square enPassantDestSquare = GetEnPassantSquare();
 			const bool isCapture = GetPiece(inDest) != nullptr || enPassantDestSquare == inDest;
-			const bool specifyRank = false; //TODO : Implement this
-			const bool specifyFile = false; //ToDO : Implement this
+			bool specifyRank = false; //TODO : Implement this
+			bool specifyFile = false; //ToDO : Implement this
 			const bool whitesMove = currPiece->m_color == eBlack;
 			const bool* castlingOptions = GetCastlingFlag();
+
+			auto allLegalMoves = GetLegalMoves(currPiece->m_color);
+			for (auto legalMove : allLegalMoves)
+			{
+				if (legalMove != myMove && legalMove.m_dest == inDest && GetPiece(legalMove.m_origin)->m_name == currPiece->m_name)
+				{
+					if (legalMove.m_origin.GetFile() != inBase.GetFile())
+						specifyFile = true;
+					else
+						specifyRank = true;
+				}
+			}
 
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
@@ -375,7 +387,7 @@ void GameNotation::PushMove(const std::string &in_piecesPosition, const std::str
 	m_vNotation.push_back(newNode);
 }
 
-std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool /*specifyRank*/, const bool /*specifyFile*/, CheckOrMate checkOrMate)
+std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate)
 {
 	std::string retVal;
 	
@@ -388,6 +400,10 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 		retVal += pieceName == "P" ? "" : pieceName;
 		if (pieceName == "P" && isCapture)
 			retVal += char(in_origin.GetFile() + 'a');
+		if (specifyFile)
+			retVal += char(in_origin.GetFile() + 'a');
+		if (specifyRank)
+			retVal += char(in_origin.GetRank() + '1');
 		retVal += isCapture ? "x" : "";
 		retVal += char(in_dest.GetFile() + 'a');
 		retVal += char(in_dest.GetRank() + '1');

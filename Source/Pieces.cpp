@@ -21,9 +21,10 @@ void RecursiveCheckCaptures(Board &board, Square source, int xDirection, int yDi
 		dest.GetRank() > BoardSize - 1 || dest.GetRank() < 0)
 		return;
 	Piece* destPiece = board.GetPiece(dest);
-	if (destPiece && destPiece->m_color == canCaptureColor)
+	if (destPiece)
 	{
-		outCaptures.push_back(destPiece);
+		if (destPiece->m_color == canCaptureColor)
+			outCaptures.push_back(destPiece);
 		return;
 	}
 	RecursiveCheckCaptures(board, dest, xDirection, yDirection, outCaptures, canCaptureColor);

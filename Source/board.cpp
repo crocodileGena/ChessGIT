@@ -330,7 +330,8 @@ std::vector<Piece*> Board::GetPieces()
 		for (int j = 0; j < BoardSize; ++j)
 		{
 			Piece* currPiece = GetPiece({ i,j });
-			retVal.push_back(currPiece);
+			if (currPiece != nullptr)
+				retVal.push_back(currPiece);
 		}
 	}
 	return retVal;

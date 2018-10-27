@@ -255,9 +255,8 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
 
-			SetCheckOrMate(DeriveCheckOrMate());
-
 			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
+			SetCheckOrMate(DeriveCheckOrMate());
 			UpdateCastlingFlag(currPiece, inBase);
 			m_lastColorMoved = currPiece->m_color;
 			m_gameNotation.PushMove(GetPiecesPosition(), currPiece->m_name, inBase, inDest,
@@ -286,6 +285,9 @@ CheckOrMate Board::DeriveCheckOrMate()
 		retVal = noLegalMoves ? eMate : eCheck;
 	else
 		retVal = noLegalMoves ? eDraw : eNone;
+
+	if (m_halfmoveClock > 100)
+		retVal = eDraw;
 
 	return retVal;
 }

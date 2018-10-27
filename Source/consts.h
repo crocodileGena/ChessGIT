@@ -128,7 +128,8 @@ enum CheckOrMate
 {
 	eNone = 0,
 	eCheck,
-	eMate
+	eMate,
+	eDraw
 };
 
 enum Worth

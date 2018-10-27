@@ -255,12 +255,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
 
-			if (CheckIsCheck())
-			{
-				SetCheckOrMate(CheckIsMate() ? eMate : eCheck);
-			}
-			else
-				SetCheckOrMate(eNone);
+			SetCheckOrMate(DeriveCheckOrMate());
 
 			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 			UpdateCastlingFlag(currPiece, inBase);
@@ -277,6 +272,23 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	return isPieceMoved;
 }
 
+CheckOrMate Board::DeriveCheckOrMate()
+{
+	CheckOrMate retVal = eNone;
+
+	bool noLegalMoves = false;
+	Color for_which_color = m_lastColorMoved;
+	std::vector<Move> legalMoves = GetLegalMoves(for_which_color);
+	if (legalMoves.empty())
+		noLegalMoves = true;
+
+	if (CheckIsCheck())
+		retVal = noLegalMoves ? eMate : eCheck;
+	else
+		retVal = noLegalMoves ? eDraw : eNone;
+
+	return retVal;
+}
 void Board::CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest)
 {
 	// Make the move
@@ -411,6 +423,8 @@ std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Squar
 			retVal += "+";
 		else if (checkOrMate == eMate)
 			retVal += "#";
+		else if (checkOrMate == eDraw)
+			retVal += "=";
 	}
 	return retVal;
 }

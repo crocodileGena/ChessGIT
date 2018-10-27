@@ -96,7 +96,8 @@ public:
 	
 	bool CheckIsCheck();
 	bool CheckIsMate();
-	
+	CheckOrMate DeriveCheckOrMate();
+
 	std::string GetStatus() { return m_status; }
 	CheckOrMate GetCheckOrMate() const { return m_checkOrMate; }
 	Square GetEnPassantSquare() const { return m_enPassantSquare; }

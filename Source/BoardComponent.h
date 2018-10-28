@@ -34,6 +34,8 @@ public:
 	}
 	void mouseDown(const MouseEvent &event) override;
 	void paint(Graphics& g) override;
+	std::string GetFEN() { return fen; }
+
 private:
 	std::string fen;
 	std::string algebraic;
@@ -50,6 +52,8 @@ public:
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { boardStates.clear(); }
 	int GetNumberofMoves() { return int(((double)boardStates.size() / 2) + 0.6); }
+	BoardStateButton* GetNode(const size_t index) { return boardStates[index]; }
+	size_t GetBoardStatesSize() { return boardStates.size(); }
 
 private:
 	int currNode;

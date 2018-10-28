@@ -373,6 +373,12 @@ void NotationComponent::resized()
 	auto boardComponent = mainComponent->GetBoardComponent();
 
 	start.onClick = [boardComponent] {boardComponent->GetBoard()->LoadFEN(); boardComponent->repaint(); };
+	end.onClick = [this, boardComponent]
+	{
+		std::string endPosition = movesComponent.GetNode(movesComponent.GetBoardStatesSize() - 1)->GetFEN();
+		boardComponent->GetBoard()->LoadFEN(endPosition); boardComponent->repaint(); 
+	};
+
 }
 
 void MovesComponent::paint(Graphics& g)

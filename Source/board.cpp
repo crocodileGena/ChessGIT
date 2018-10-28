@@ -371,15 +371,15 @@ bool Board::IsADraw(const bool noLegalMoves, const std::string piecesPosition)
 		retVal = true;
 	else
 	{
+		std::vector<Piece*> leftPieces = GetPieces();
+		const size_t numLeftPieces = leftPieces.size();
 		int whiteSum(0), blackSum(0);
 		PiecesSum(whiteSum, blackSum);
 		int combined = whiteSum + blackSum;
-		if (combined == 0 || combined == 3)
+		if ((combined == 0 || combined == 3) && numLeftPieces > 3)
 			retVal = true;
-		else if (combined == 6)
+		else if (combined == 6 && numLeftPieces == 4)
 		{
-			//must be two pieces
-			std::vector<Piece*> leftPieces = GetPieces();
 			std::string firstPiece = leftPieces.at(0)->m_name;
 			std::string secondPiece = leftPieces.at(1)->m_name;
 			Color firstPieceColor = leftPieces.at(0)->m_color;

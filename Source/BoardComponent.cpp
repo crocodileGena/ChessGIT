@@ -269,6 +269,7 @@ void BoardStateButton::mouseDown(const MouseEvent &event)
 {
 	auto myGrandParentComponent = findParentComponentOfClass <NotationComponent>();
 	myGrandParentComponent->GetBoard()->LoadFEN(fen);
+	myGrandParentComponent->SetStateIndex(myIndex);
 
 	Button::mouseDown(event);
 }
@@ -292,7 +293,8 @@ myBoard(inBoard),
 start("<<"),
 next(">"),
 prev("<"),
-end(">>")
+end(">>"),
+currentState(0)
 {
 	vpMovesComponent.setViewedComponent(&movesComponent, false);
 	addAndMakeVisible(next);
@@ -312,11 +314,14 @@ void NotationComponent::paint(Graphics& g)
 void NotationComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
 	movesComponent.addBoardState(in_fen, in_algebraic);
+	SetStateIndex(GetStateIndex() + 1);
 }
 
 void MovesComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
-	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic);
+	static size_t currIndex = 1;
+	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic, currIndex);
+	++currIndex;
 	boardStates.add(newState);
 	setColour(3, Colours::white);
 	addAndMakeVisible(*newState);
@@ -324,7 +329,10 @@ void MovesComponent::addBoardState(const std::string &in_fen, const std::string 
 
 	auto mainComponent = findParentComponentOfClass <MainComponent>();
 	auto boardComponent = mainComponent->GetBoardComponent();
-	newState->onClick = [boardComponent] {boardComponent->repaint(); };
+	newState->onClick = [mainComponent, boardComponent] 
+	{
+		boardComponent->repaint(); 
+	};
 }
 
 void MovesComponent::resized()
@@ -372,11 +380,51 @@ void NotationComponent::resized()
 	MainComponent *mainComponent = dynamic_cast<MainComponent*>(getParentComponent());
 	auto boardComponent = mainComponent->GetBoardComponent();
 
-	start.onClick = [boardComponent] {boardComponent->GetBoard()->LoadFEN(); boardComponent->repaint(); };
+	start.onClick = [this, boardComponent]
+	{
+		SetStateIndex(0);
+		boardComponent->GetBoard()->LoadFEN(); 
+		boardComponent->repaint(); 
+	};
+	
 	end.onClick = [this, boardComponent]
 	{
-		std::string endPosition = movesComponent.GetNode(movesComponent.GetBoardStatesSize() - 1)->GetFEN();
-		boardComponent->GetBoard()->LoadFEN(endPosition); boardComponent->repaint(); 
+		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
+		SetStateIndex(lastStateIndex);
+		if (lastStateIndex == 0)
+			return;
+		std::string endPosition = movesComponent.GetNode(lastStateIndex - 1)->GetFEN();
+		boardComponent->GetBoard()->LoadFEN(endPosition); 
+		boardComponent->repaint(); 
+	};
+	
+	next.onClick = [this, boardComponent]
+	{
+		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
+		const size_t stateIndex = GetStateIndex();
+		if (stateIndex >= lastStateIndex)
+			return;
+		SetStateIndex(stateIndex + 1);
+		std::string nextPosition = movesComponent.GetNode(stateIndex)->GetFEN();
+		boardComponent->GetBoard()->LoadFEN(nextPosition);
+		boardComponent->repaint();
+	};
+	
+	prev.onClick = [this, boardComponent]
+	{
+		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
+		const size_t stateIndex = GetStateIndex();
+		if (stateIndex < 1 || lastStateIndex < stateIndex)
+			return;
+		SetStateIndex(stateIndex - 1);
+		if (stateIndex == 1)
+			boardComponent->GetBoard()->LoadFEN();
+		else
+		{
+			std::string prevPosition = movesComponent.GetNode(stateIndex - 2)->GetFEN();
+			boardComponent->GetBoard()->LoadFEN(prevPosition);
+		}
+		boardComponent->repaint();
 	};
 
 }

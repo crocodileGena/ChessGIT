@@ -28,8 +28,8 @@ private:
 class BoardStateButton : public TextButton
 {
 public:
-	BoardStateButton(const std::string in_fen, const std::string in_algebraic) :
-		fen(in_fen), algebraic(in_algebraic) {
+	BoardStateButton(const std::string in_fen, const std::string in_algebraic, const size_t in_dex) :
+		fen(in_fen), algebraic(in_algebraic), myIndex(in_dex) {
 		setName(in_algebraic);
 	}
 	void mouseDown(const MouseEvent &event) override;
@@ -37,6 +37,7 @@ public:
 	std::string GetFEN() { return fen; }
 
 private:
+	size_t myIndex;
 	std::string fen;
 	std::string algebraic;
 	//==============================================================================
@@ -56,7 +57,6 @@ public:
 	size_t GetBoardStatesSize() { return boardStates.size(); }
 
 private:
-	int currNode;
 	OwnedArray<BoardStateButton> boardStates;
 
 	//==============================================================================
@@ -72,6 +72,9 @@ public:
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { movesComponent.Reset(); resized(); }
 	Board* GetBoard() { return myBoard; }
+	void SetStateIndex(const size_t in_dex) { currentState = in_dex; }
+	size_t GetStateIndex() { return currentState; }
+
 private:
 	Board* myBoard;
 	TextButton start;
@@ -80,6 +83,7 @@ private:
 	TextButton end;
 	MovesComponent movesComponent;
 	Viewport vpMovesComponent;
+	size_t currentState;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NotationComponent)

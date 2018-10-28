@@ -122,7 +122,7 @@ public:
 	void QueenAPawn(const Square in_square, const std::string in_piece);
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
-	void LoadFEN(const std::string in_position);
+	void LoadFEN(const std::string in_position = fenOpening);
 
 	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];

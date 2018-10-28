@@ -368,6 +368,11 @@ void NotationComponent::resized()
 	movesComponent.setBounds(0,0, componentBounds.getRight() - 10, movesComponentHeight);
 	vpMovesComponent.setBounds(0, 2, componentBounds.getRight(), 350);
 	vpMovesComponent.setViewPositionProportionately(1, 1);
+
+	MainComponent *mainComponent = dynamic_cast<MainComponent*>(getParentComponent());
+	auto boardComponent = mainComponent->GetBoardComponent();
+
+	start.onClick = [boardComponent] {boardComponent->GetBoard()->LoadFEN(); boardComponent->repaint(); };
 }
 
 void MovesComponent::paint(Graphics& g)

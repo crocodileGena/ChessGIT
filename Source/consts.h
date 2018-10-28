@@ -2,6 +2,7 @@
 
 #define kIllegalSquare 8
 
+const std::string fenOpening = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const int staticButtonHeight = 20;
 const int moveButtonHeight = 20;
 const int staticButtonWidth = 30;

@@ -2,14 +2,15 @@
 #include "Pieces.h"
 #include <stdlib.h>
 
-std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin)
+std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin, const bool checkUnefendend)
 {
 	auto checkOrMate = in_board.GetCheckOrMate();
 	std::vector<Move> retVal;
 	if (checkOrMate == eNone || checkOrMate == eCheck)
 	{
 		retVal = GetLegalMovesSelf(in_board, origin);
-		in_board.RemoveUndefendedCheckMoves(retVal);
+		if (checkUnefendend)
+			in_board.RemoveUndefendedCheckMoves(retVal);
 	}
 	return retVal;
 }
@@ -645,9 +646,19 @@ std::vector<Piece*> Queen::CanPieceCapture(Board &board, const Square source)
 	return retVal;
 }
 
-std::vector<Piece*> King::CanPieceCapture(Board &/*board*/, const Square source)
+std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal;
+	static int recursive = 0;
+	++recursive;
+	auto legalMoves = GetLegalMoves(board, source, recursive > 1 ? true: false);
+	--recursive;
+	for (auto legalMove : legalMoves)
+	{
+		Piece* destPiece = board.GetPiece(legalMove.m_dest);
+		if (destPiece && destPiece->m_color != m_color)
+			retVal.push_back(destPiece);
+	}
 	return retVal;
 }
 

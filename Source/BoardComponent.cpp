@@ -321,6 +321,10 @@ void MovesComponent::addBoardState(const std::string &in_fen, const std::string 
 	setColour(3, Colours::white);
 	addAndMakeVisible(*newState);
 	resized();
+
+	auto mainComponent = findParentComponentOfClass <MainComponent>();
+	auto boardComponent = mainComponent->GetBoardComponent();
+	newState->onClick = [boardComponent] {boardComponent->repaint(); };
 }
 
 void MovesComponent::resized()

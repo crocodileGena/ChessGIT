@@ -141,9 +141,21 @@ void Board::PrintBoard()
 
 }
 
+void Board::RemovePieces()
+{
+	for (int i = 0; i < BoardSize; ++i)
+	{
+		for (int j = 0; j < BoardSize; ++j)
+		{
+			Piece* currPiece = GetPiece({ i,j });
+			delete(currPiece);
+			SetPiece({ i,j }, nullptr);
+		}
+	}
+}
 void Board::LoadFEN(const std::string in_fen)
 {
-	ResetBoard();
+	RemovePieces();
 
 	std::string position;
 	bool* castlingOptions = new bool[4];
@@ -155,6 +167,50 @@ void Board::LoadFEN(const std::string in_fen)
 	//	isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 	//	enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 	m_gameNotation.ParseFEN(in_fen, position, castlingOptions, enPassantDestSquare, halfMoveClock, whitesMove);
+	PlacePieces(position);
+	for (int i = 0; i < numCastlingOptions; ++i)
+		m_castlingFlag[i] = castlingOptions[i];
+	SetEnPassantSquare(enPassantDestSquare);
+	m_halfmoveClock = halfMoveClock;
+	m_lastColorMoved = whitesMove ? eWhite : eBlack;
+}
+
+void Board::PlacePieces(const std::string in_position)
+{
+	int stringIndex = 0;
+	for (int j = BoardSize - 1; j >= 0; --j)
+	{
+		for (int i = 0; i < BoardSize; ++i)
+		{
+			char currChar = in_position[stringIndex++];
+			Square currSquare(i, j);
+			if (currChar == 'r')
+				SetPiece(currSquare, new Rook(Color::eBlack));
+			else if (currChar == 'n')
+				SetPiece(currSquare, new Knight(Color::eBlack));
+			else if (currChar == 'b')
+				SetPiece(currSquare, new Bishop(Color::eBlack));
+			else if (currChar == 'q')
+				SetPiece(currSquare, new Queen(Color::eBlack));
+			else if (currChar == 'k')
+				SetPiece(currSquare, new King(Color::eBlack));
+			else if (currChar == 'p')
+				SetPiece(currSquare, new Pawn(Color::eBlack));
+			else if (currChar == 'R')
+				SetPiece(currSquare, new Rook(Color::eWhite));
+			else if (currChar == 'N')
+				SetPiece(currSquare, new Knight(Color::eWhite));
+			else if (currChar == 'B')
+				SetPiece(currSquare, new Bishop(Color::eWhite));
+			else if (currChar == 'Q')
+				SetPiece(currSquare, new Queen(Color::eWhite));
+			else if (currChar == 'K')
+				SetPiece(currSquare, new King(Color::eWhite));
+			else if (currChar == 'P')
+				SetPiece(currSquare, new Pawn(Color::eWhite));
+
+		}
+	}
 }
 
 std::string Board::GetPiecesPosition()

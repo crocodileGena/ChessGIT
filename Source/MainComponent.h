@@ -26,6 +26,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 	NotationComponent* GetGameNotation() { return &gameNotation; }
+	BoardComponent* GetBoardComponent() { return &boardGUI; }
 
 private:
     //==============================================================================

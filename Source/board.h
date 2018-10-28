@@ -92,6 +92,8 @@ public:
 
 	void PrintBoard();
 	void ResetBoard();
+	void RemovePieces();
+	void PlacePieces(const std::string in_position);
 	void PiecesSum(int& whiteSum, int& blackSum);
 	
 	bool MovePiece(const Square inBase, const Square inDest);

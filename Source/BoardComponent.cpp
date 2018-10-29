@@ -46,12 +46,6 @@ knightButton("knightSelection")
 	addAndMakeVisible(queenButton);
 	addAndMakeVisible(bishopButton);
 	addAndMakeVisible(knightButton);
-
-
-	rookButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "R"); setVisible(false); getParentComponent()->repaint(); };
-	queenButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "Q"); setVisible(false); getParentComponent()->repaint(); };
-	bishopButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "B"); setVisible(false); getParentComponent()->repaint(); };
-	knightButton.onClick = [this] { myBoard->QueenAPawn(queeningSquare, "N"); setVisible(false); getParentComponent()->repaint(); };
 }
 
 void QueeningComponent::resized()
@@ -60,6 +54,38 @@ void QueeningComponent::resized()
 	queenButton.setBounds(65, 5, 60, 60);
 	bishopButton.setBounds(125, 5, 60, 60);
 	knightButton.setBounds(185, 5, 60, 60);
+
+	auto mainComponent = findParentComponentOfClass <MainComponent>();
+	auto notationComponent = mainComponent->GetGameNotation();
+
+	rookButton.onClick = [this, notationComponent]
+	{
+		myBoard->QueenAPawn(queeningSquare, "R");
+		setVisible(false);
+		getParentComponent()->repaint();
+		notationComponent->UpdatePromotionNode();
+	};
+	queenButton.onClick = [this, notationComponent]
+	{
+		myBoard->QueenAPawn(queeningSquare, "Q");
+		setVisible(false);
+		getParentComponent()->repaint();
+		notationComponent->UpdatePromotionNode();
+	};
+	bishopButton.onClick = [this, notationComponent]
+	{
+		myBoard->QueenAPawn(queeningSquare, "B");
+		setVisible(false);
+		getParentComponent()->repaint();
+		notationComponent->UpdatePromotionNode();
+	};
+	knightButton.onClick = [this, notationComponent]
+	{
+		myBoard->QueenAPawn(queeningSquare, "N");
+		setVisible(false);
+		getParentComponent()->repaint();
+		notationComponent->UpdatePromotionNode();
+	};
 }
 
 void BoardComponent::resized()

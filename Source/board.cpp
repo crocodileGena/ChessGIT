@@ -287,7 +287,17 @@ void Board::QueenAPawn(const Square in_square, const std::string in_piece)
 	else if (in_piece == "N")
 		newPiece = new Knight(in_square.GetRank() == Eight ? eWhite : eBlack);
 
-	board[in_square.GetFile()][in_square.GetRank()] = newPiece;
+	SetPiece(in_square, newPiece);
+
+	if (in_square.GetRank() == Eight)
+		m_gameNotation.UpdatePromotedPawn(in_piece);
+	else
+	{
+		std::string lowerCase;
+		char myChar = (char)std::tolower(in_piece[0]);
+		lowerCase += myChar;
+		m_gameNotation.UpdatePromotedPawn(lowerCase);
+	}	
 }
 
 bool Board::MovePiece(const Square inBase, const Square inDest)
@@ -327,6 +337,10 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
 
+			//if queened a pawn
+			if (inDest.GetRank() == (currPiece->m_color == eWhite ? Eight : One))
+				SetQueeningMode(true);
+
 			const std::string piecesPosition = GetPiecesPosition();
 			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
 			SetCheckOrMate(DeriveCheckOrMate(piecesPosition));
@@ -336,6 +350,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 			UpdateEnPassantSquare(currPiece, inBase, inDest);
+
 		}
 	}
 	if (!isPieceMoved)

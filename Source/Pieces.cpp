@@ -496,8 +496,6 @@ std::vector<Move> Pawn::GetLegalMovesSelf(const Board& in_board, const Square or
 		retVal.push_back({ origin, twoStepsBlack });
 	}
 
-	if (in_board.GetCheckOrMate() == eCheck)
-		in_board.RemoveUndefendedCheckMoves(retVal);
 	//if (retVal && (dest.GetRank() == Eight || dest.GetRank() == One))
 	//	board.SetQueeningMode(true); //TODO - Add queening options to legal moves
 	return retVal;

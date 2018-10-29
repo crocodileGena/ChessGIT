@@ -46,6 +46,15 @@ public:
 		m_algebraic(in_algebraic), m_fen(in_fen), m_position(in_position) {}
 	~NotationNode() {}
 
+	void UpdatePromotedPawn(const std::string piece_name) 
+	{ 
+		if (m_fen.find('w') == std::string::npos)
+			m_fen[m_fen.find_first_of('P')] = piece_name[0];
+		else
+			m_fen[m_fen.find_last_of('p')] = piece_name[0];
+
+		m_algebraic += "=" + piece_name; 
+	}
 	std::string GetAlgebraic() { return m_algebraic; }
 	std::string GetFEN() { return m_fen; }
 	std::string GetPosition() { return m_position; }
@@ -71,6 +80,12 @@ public:
 	NotationNode GetLastNode() { return m_vNotation.back(); }
 	bool IsPerpetual(const std::string &in_piecesPosition, const bool whitesMove);
 	void ParseFEN(const std::string& in_fen, std::string& position, bool* castlingOptions, Square& enPassantDestSquare, int& halfMoveClock, bool& whitesMove);
+	void UpdatePromotedPawn(const std::string pieceName) { m_vNotation.back().UpdatePromotedPawn(pieceName); }
+	void GetLastNode(std::string& in_algebraic, std::string& in_fen)
+	{ 
+		in_algebraic = m_vNotation.back().GetAlgebraic(); 
+		in_fen = m_vNotation.back().GetFEN();
+	}
 
 private:
 	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate);

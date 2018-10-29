@@ -35,6 +35,7 @@ public:
 	void mouseDown(const MouseEvent &event) override;
 	void paint(Graphics& g) override;
 	std::string GetFEN() { return fen; }
+	void UpdateState(const std::string in_algebraic, const std::string in_fen) { algebraic = in_algebraic; fen = in_fen; }
 
 private:
 	size_t myIndex;
@@ -55,7 +56,13 @@ public:
 	int GetNumberofMoves() { return int(((double)boardStates.size() / 2) + 0.6); }
 	BoardStateButton* GetNode(const size_t index) { return boardStates[index]; }
 	size_t GetBoardStatesSize() { return boardStates.size(); }
+	void UpdatePromotionNode(const std::string in_algebraic, const std::string in_fen)
+	{
+		boardStates.getLast()->UpdateState(in_algebraic, in_fen);
+		boardStates.getLast()->setName(in_algebraic);
+		boardStates.getLast()->repaint();
 
+	}
 private:
 	OwnedArray<BoardStateButton> boardStates;
 
@@ -74,6 +81,13 @@ public:
 	Board* GetBoard() { return myBoard; }
 	void SetStateIndex(const size_t in_dex) { currentState = in_dex; }
 	size_t GetStateIndex() { return currentState; }
+	void UpdatePromotionNode() 
+	{ 
+		std::string algebraicStr;
+		std::string fenStr;
+		myBoard->m_gameNotation.GetLastNode(algebraicStr, fenStr);
+		movesComponent.UpdatePromotionNode(algebraicStr, fenStr);
+	}
 
 private:
 	Board* myBoard;

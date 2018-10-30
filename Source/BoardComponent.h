@@ -77,7 +77,7 @@ public:
 	void resized() override;
 	void paint(Graphics& g) override;
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
-	void Reset() { movesComponent.Reset(); resized(); }
+	void Reset() { SetStateIndex(0);  movesComponent.Reset(); resized(); }
 	Board* GetBoard() { return myBoard; }
 	void SetStateIndex(const size_t in_dex) { currentState = in_dex; }
 	size_t GetStateIndex() { return currentState; }

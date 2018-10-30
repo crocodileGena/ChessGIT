@@ -649,7 +649,7 @@ std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
 	std::vector<Piece*> retVal;
 	static int recursive = 0;
 	++recursive;
-	auto legalMoves = GetLegalMoves(board, source, recursive > 1 ? true: false);
+	auto legalMoves = GetLegalMoves(board, source, recursive > 1 ? false : true);
 	--recursive;
 	for (auto legalMove : legalMoves)
 	{

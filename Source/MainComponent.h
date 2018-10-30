@@ -27,6 +27,7 @@ public:
     void resized() override;
 	NotationComponent* GetGameNotation() { return &gameNotation; }
 	BoardComponent* GetBoardComponent() { return &boardGUI; }
+	bool IsBlackView() { return flipBoard.getToggleState(); }
 
 private:
     //==============================================================================
@@ -34,6 +35,7 @@ private:
 	BoardComponent boardGUI;
 	NotationComponent gameNotation;
 	ResetButton resetBoard;
+	ToggleButton flipBoard;
 	StatusComponent boardStatus;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

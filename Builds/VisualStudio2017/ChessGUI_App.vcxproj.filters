@@ -2877,4 +2877,9 @@
       <Filter>ChessGUI\Resources</Filter>
     </CopyFileToFolders>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Images\BlackBackground.jpg">
+      <Filter>ChessGUI\Resources</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

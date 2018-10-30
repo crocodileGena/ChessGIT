@@ -122,6 +122,9 @@ void BoardComponent::LoadImages()
 	File f(workingDir + "Background.jpg");
 	background = ImageFileFormat::loadFrom(f);
 
+	File bf(workingDir + "BlackBackground.jpg");
+	blackBackground = ImageFileFormat::loadFrom(bf);
+
 	File as(workingDir + "ActiveSquare.png");
 	activeSquareImage = ImageFileFormat::loadFrom(as);
 
@@ -167,11 +170,28 @@ void BoardComponent::LoadImages()
 
 void BoardComponent::paint(Graphics& g)
 {
-	g.drawImageAt(background, 0, 0);
+	MainComponent* mainComponent = findParentComponentOfClass<MainComponent>();
+	const bool isBlackView = mainComponent->IsBlackView();
+	
+	g.drawImageAt(isBlackView ? blackBackground : background, 0, 0);
 	Image* imageToDraw = nullptr;
 
-	if (activeSquare.getX() != kIllegalSquare)
-		g.drawImageAt(activeSquareImage, activeSquare.getX()*60 + drawOffset, activeSquare.getY()*60 + drawOffset);
+	if (activeSquare.GetFile() != kIllegalSquare)
+	{
+		int xOffset = 0;
+		int yOffset = 0;
+		if (isBlackView)
+		{
+			xOffset = (7 - activeSquare.GetFile()) * 60 + drawOffset;
+			yOffset = activeSquare.GetRank() * 60 + drawOffset;
+		}
+		else
+		{
+			xOffset = activeSquare.GetFile() * 60 + drawOffset;
+			yOffset = (7 - activeSquare.GetRank()) * 60 + drawOffset;
+		}
+		g.drawImageAt(activeSquareImage, xOffset, yOffset);
+	}
 	
 	for (int j = BoardSize - 1; j >= 0; --j)
 		for (int i = 0; i < BoardSize; ++i)
@@ -207,7 +227,10 @@ void BoardComponent::paint(Graphics& g)
 				default:
 					continue;
 				}
-				g.drawImageAt(*imageToDraw, i * 60 + drawOffset, (7 - j) * 60 + drawOffset);
+				if (isBlackView)
+					g.drawImageAt(*imageToDraw, (7 - i) * 60 + drawOffset, j * 60 + drawOffset);
+				else
+					g.drawImageAt(*imageToDraw, i * 60 + drawOffset, (7 - j) * 60 + drawOffset);
 			}
 			else
 				imageToDraw = nullptr;
@@ -220,24 +243,32 @@ void BoardComponent::paint(Graphics& g)
 		else
 			blackQueeningComponent.setVisible(true);
 	}
-	else if (activeSquare.getX() != kIllegalSquare)
+	else if (activeSquare.GetFile() != kIllegalSquare)
 	{
-		const Square mySquare = { activeSquare.getX(), 7 - activeSquare.getY() };
+		const Square mySquare = { activeSquare.GetFile(), activeSquare.GetRank() };
 		Piece* myPiece = myBoard->GetPiece(mySquare);
 		if (myPiece && myPiece->m_color != myBoard->m_lastColorMoved)
 		{
 			std::vector<Move> legalMoves = myPiece->GetLegalMoves(*myBoard, mySquare);
-			for (auto move :legalMoves)
-				g.drawImageAt(legalMoveImage,  move.m_dest.GetFile() * 60 + drawOffset, (7 - move.m_dest.GetRank()) * 60 + drawOffset);
+			for (auto move : legalMoves)
+			{
+				if (isBlackView)
+					g.drawImageAt(legalMoveImage,  (7 - move.m_dest.GetFile()) * 60 + drawOffset, move.m_dest.GetRank() * 60 + drawOffset);
+				else
+					g.drawImageAt(legalMoveImage, move.m_dest.GetFile() * 60 + drawOffset, (7 - move.m_dest.GetRank()) * 60 + drawOffset);
+
+			}
 			
 		}
 	}
-
 }
 
 void BoardComponent::mouseDown(const MouseEvent &event)
 {
-	Square origin({ activeSquare.getX(), 7 -activeSquare.getY() });
+	MainComponent* mainComponent = findParentComponentOfClass<MainComponent>();
+	const bool isBlackView = mainComponent->IsBlackView();
+
+	Square origin({ activeSquare.GetFile(), activeSquare.GetRank() });
 	juce::Point<int> destPos = event.getPosition();
 
 	auto destX = (destPos.getX() - drawOffset) / 60;
@@ -248,17 +279,20 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		destX = kIllegalSquare;
 
 	Square dest({ destX, 7 -destY });
+	if (isBlackView)
+		dest.SetSquare(7 - dest.GetFile(), 7 - dest.GetRank());
+
 	if (!myBoard->GetQueeningMode())
 	{
-		activeSquare.setX(destX);
-		activeSquare.setY(destY);
+		activeSquare.SetFile(dest.GetFile());
+		activeSquare.SetRank(dest.GetRank());
 
 		if (origin == dest)
-			activeSquare.setX(kIllegalSquare);
+			activeSquare.SetFile(kIllegalSquare);
 	}
 
 	bool pieceMoved = false;
-	if (kIllegalSquare != activeSquare.getX())
+	if (kIllegalSquare != activeSquare.GetFile())
 		pieceMoved = myBoard->MovePiece(origin, dest);
 
 	if (pieceMoved)

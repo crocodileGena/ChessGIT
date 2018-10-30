@@ -137,16 +137,17 @@ public:
 	void resized() override;
 	void mouseDown(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
-	void SetAvtiveSquare(juce::Point<int> inSquare) { activeSquare = inSquare; }
+	void SetAvtiveSquare(const Square inSquare) { activeSquare = inSquare; }
 	void ResetClicked();
 private:
 	Board* myBoard;
-	juce::Point<int> activeSquare;
+	Square activeSquare;
 	Square queeningSquare;
 	QueeningComponent whiteQueeningComponent;
 	QueeningComponent blackQueeningComponent;
 
 	Image background;
+	Image blackBackground;
 	Image activeSquareImage;
 	Image legalMoveImage;
 	Image bKing;

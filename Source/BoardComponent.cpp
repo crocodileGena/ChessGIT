@@ -110,7 +110,7 @@ whiteQueeningComponent(true)
 
 void BoardComponent::ResetClicked()
 {
-	SetAvtiveSquare({ kIllegalSquare, kIllegalSquare });
+	SetActiveSquare({ kIllegalSquare, kIllegalSquare });
 	repaint(); 
 }
 void BoardComponent::LoadImages()
@@ -328,7 +328,7 @@ void ResetButton::mouseDown(const MouseEvent &event)
 void BoardStateButton::mouseDown(const MouseEvent &event)
 {
 	auto myGrandParentComponent = findParentComponentOfClass <NotationComponent>();
-	myGrandParentComponent->GetBoard()->LoadFEN(fen);
+	myGrandParentComponent->GetBoard()->LoadFEN(fen, myIndex);
 	myGrandParentComponent->SetStateIndex(myIndex);
 
 	Button::mouseDown(event);
@@ -444,6 +444,7 @@ void NotationComponent::resized()
 	{
 		SetStateIndex(0);
 		boardComponent->GetBoard()->LoadFEN(); 
+		boardComponent->SetActiveSquare({ kIllegalSquare, kIllegalSquare });
 		boardComponent->repaint(); 
 	};
 	
@@ -454,8 +455,9 @@ void NotationComponent::resized()
 		if (lastStateIndex == 0)
 			return;
 		std::string endPosition = movesComponent.GetNode(lastStateIndex - 1)->GetFEN();
-		boardComponent->GetBoard()->LoadFEN(endPosition); 
-		boardComponent->repaint(); 
+		boardComponent->GetBoard()->LoadFEN(endPosition, lastStateIndex);
+		boardComponent->SetActiveSquare({ kIllegalSquare, kIllegalSquare });
+		boardComponent->repaint();
 	};
 	
 	next.onClick = [this, boardComponent]
@@ -466,7 +468,8 @@ void NotationComponent::resized()
 			return;
 		SetStateIndex(stateIndex + 1);
 		std::string nextPosition = movesComponent.GetNode(stateIndex)->GetFEN();
-		boardComponent->GetBoard()->LoadFEN(nextPosition);
+		boardComponent->GetBoard()->LoadFEN(nextPosition, GetStateIndex());
+		boardComponent->SetActiveSquare({ kIllegalSquare, kIllegalSquare });
 		boardComponent->repaint();
 	};
 	
@@ -482,8 +485,9 @@ void NotationComponent::resized()
 		else
 		{
 			std::string prevPosition = movesComponent.GetNode(stateIndex - 2)->GetFEN();
-			boardComponent->GetBoard()->LoadFEN(prevPosition);
+			boardComponent->GetBoard()->LoadFEN(prevPosition, GetStateIndex());
 		}
+		boardComponent->SetActiveSquare({ kIllegalSquare, kIllegalSquare });
 		boardComponent->repaint();
 	};
 

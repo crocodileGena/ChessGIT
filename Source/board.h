@@ -74,18 +74,19 @@ public:
 	~GameNotation() { m_vNotation.clear(); }
 	void Reset() { m_vNotation.clear(); }
 
-	void PushMove(const std::string &in_piecesPosition, const std::string &pieceName, Square in_origin, const Square in_dest,
+	size_t PushMove(const std::string &in_piecesPosition, const std::string &pieceName, Square in_origin, const Square in_dest,
 					const bool isCapture, const bool specifyRank, const bool specifyFile,
 					const bool whitesMove, const bool* castlingOptions, const Square enPassant, const int halfmoveClock, CheckOrMate checkOrMate);
-	NotationNode GetLastNode() { return m_vNotation.back(); }
 	bool IsPerpetual(const std::string &in_piecesPosition, const bool whitesMove);
 	void ParseFEN(const std::string& in_fen, std::string& position, bool* castlingOptions, Square& enPassantDestSquare, int& halfMoveClock, bool& whitesMove);
 	void UpdatePromotedPawn(const std::string pieceName) { m_vNotation.back().UpdatePromotedPawn(pieceName); }
+	NotationNode GetLastNode() { return m_vNotation.back(); }
 	void GetLastNode(std::string& in_algebraic, std::string& in_fen)
 	{ 
 		in_algebraic = m_vNotation.back().GetAlgebraic(); 
 		in_fen = m_vNotation.back().GetFEN();
 	}
+	size_t GetNumberOfNodes() const { return m_vNotation.size(); }
 
 private:
 	std::string GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate);
@@ -127,6 +128,7 @@ public:
 	bool GetQueeningMode() { return m_queeningMode; }
 	std::string GetPiecesPosition();
 	std::vector<Move> GetLegalMoves(Color for_which_color);
+	size_t GetCurrentNotationIndex() const { return m_currNotationIndex; }
 
 	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
@@ -137,7 +139,7 @@ public:
 	void QueenAPawn(const Square in_square, const std::string in_piece);
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
-	void LoadFEN(const std::string in_position = fenOpening);
+	void LoadFEN(const std::string in_position = fenOpening, const size_t nodeNumber = 1);
 
 	Color m_lastColorMoved;
 	Piece* board[BoardSize][BoardSize];
@@ -151,6 +153,7 @@ private:
 	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);
 	bool CanPieceCaptureKing(std::vector<Piece *> &captures);
 
+	size_t m_currNotationIndex;
 	Square m_enPassantSquare;
 	CheckOrMate m_checkOrMate;
 };

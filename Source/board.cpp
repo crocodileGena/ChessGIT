@@ -11,7 +11,8 @@ m_status(in_board.m_status),
 m_queeningMode(in_board.m_queeningMode),
 m_enPassantSquare(in_board.m_enPassantSquare),
 m_gameNotation(in_board.m_gameNotation),
-m_checkOrMate(in_board.m_checkOrMate)
+m_checkOrMate(in_board.m_checkOrMate),
+m_currNotationIndex(in_board.m_currNotationIndex)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -49,7 +50,8 @@ m_lastColorMoved(eBlack),
 m_status("status bar"),
 m_halfmoveClock(0),
 m_queeningMode(false),
-m_checkOrMate(eNone)
+m_checkOrMate(eNone),
+m_currNotationIndex(0)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -68,6 +70,7 @@ void Board::ResetBoard()
 	m_halfmoveClock = 0;
 	m_gameNotation.Reset();
 	SetCheckOrMate(eNone);
+	m_currNotationIndex = 0;
 
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;
@@ -153,7 +156,7 @@ void Board::RemovePieces()
 		}
 	}
 }
-void Board::LoadFEN(const std::string in_fen)
+void Board::LoadFEN(const std::string in_fen, const size_t nodeNumber)
 {
 	RemovePieces();
 
@@ -163,9 +166,6 @@ void Board::LoadFEN(const std::string in_fen)
 	int halfMoveClock;
 	bool whitesMove;
 
-	//currPiece->m_name, inBase, inDest,
-	//	isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
-	//	enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 	m_gameNotation.ParseFEN(in_fen, position, castlingOptions, enPassantDestSquare, halfMoveClock, whitesMove);
 	PlacePieces(position);
 	for (int i = 0; i < numCastlingOptions; ++i)
@@ -173,6 +173,7 @@ void Board::LoadFEN(const std::string in_fen)
 	SetEnPassantSquare(enPassantDestSquare);
 	m_halfmoveClock = halfMoveClock;
 	m_lastColorMoved = whitesMove ? eWhite : eBlack;
+	m_currNotationIndex = nodeNumber;
 }
 
 void Board::PlacePieces(const std::string in_position)
@@ -306,7 +307,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 	auto currPiece = GetPiece(inBase);
 	auto checkOrMate = GetCheckOrMate();
 	if (!GetQueeningMode() && currPiece && inBase.InBounds() && inDest.InBounds() &&
-		checkOrMate != eMate && checkOrMate != eDraw)
+		checkOrMate != eMate && checkOrMate != eDraw && m_gameNotation.GetNumberOfNodes() == m_currNotationIndex)
 	{
 		auto legalMoves = currPiece->GetLegalMoves(*this, inBase);
 		Move myMove(inBase, inDest);
@@ -346,7 +347,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			SetCheckOrMate(DeriveCheckOrMate(piecesPosition));
 			UpdateCastlingFlag(currPiece, inBase);
 			m_lastColorMoved = currPiece->m_color;
-			m_gameNotation.PushMove(piecesPosition, currPiece->m_name, inBase, inDest,
+			m_currNotationIndex = m_gameNotation.PushMove(piecesPosition, currPiece->m_name, inBase, inDest,
 				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 			UpdateEnPassantSquare(currPiece, inBase, inDest);
@@ -510,7 +511,7 @@ void GameNotation::ParseFEN(const std::string& in_fen, std::string& position, bo
 			position += currChar;
 	}
 	//write white's turn
-	whitesMove = in_fen.find('w') == std::string::npos ? false : true;
+	whitesMove = in_fen.find('w') == std::string::npos ? true : false;
 	// write castling options
 	auto secondSpace = in_fen.find_first_of(' ', firstSpace + 1);
 	auto thirdSpace = in_fen.find_first_of(' ', secondSpace + 1);
@@ -581,7 +582,7 @@ void GameNotation::PositionToString(const std::string &in_position, std::string 
 		}
 	}
 }
-void GameNotation::PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
+size_t GameNotation::PushMove(const std::string &in_piecesPosition, const std::string &pieceName,
 							const Square in_origin, const Square in_dest, const bool isCapture,
 							const bool specifyRank, const bool specifyFile, const bool whitesMove,
 							const bool* castlingOptions, const Square enPassant, const int halfmoveClock,
@@ -591,6 +592,8 @@ void GameNotation::PushMove(const std::string &in_piecesPosition, const std::str
 	std::string algebraic = GetAlgebraic(pieceName, in_origin, in_dest, isCapture, specifyRank, specifyFile, checkOrMate);
 	NotationNode newNode(algebraic, fen, in_piecesPosition);
 	m_vNotation.push_back(newNode);
+
+	return m_vNotation.size();
 }
 
 std::string GameNotation::GetAlgebraic(const std::string &pieceName, const Square in_origin, const Square in_dest, const bool isCapture, const bool specifyRank, const bool specifyFile, CheckOrMate checkOrMate)

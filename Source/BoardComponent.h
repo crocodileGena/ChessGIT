@@ -137,7 +137,7 @@ public:
 	void resized() override;
 	void mouseDown(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
-	void SetAvtiveSquare(const Square inSquare) { activeSquare = inSquare; }
+	void SetActiveSquare(const Square inSquare) { activeSquare = inSquare; }
 	void ResetClicked();
 private:
 	Board* myBoard;

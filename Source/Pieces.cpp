@@ -6,7 +6,8 @@ std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origi
 {
 	auto checkOrMate = in_board.GetCheckOrMate();
 	std::vector<Move> retVal;
-	if (checkOrMate == eNone || checkOrMate == eCheck)
+	if ( (checkOrMate == eNone || checkOrMate == eCheck) && 
+		in_board.m_gameNotation.GetNumberOfNodes() == in_board.GetCurrentNotationIndex())
 	{
 		retVal = GetLegalMovesSelf(in_board, origin);
 		if (checkUnefendend)

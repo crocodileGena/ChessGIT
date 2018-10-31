@@ -385,6 +385,9 @@ void MovesComponent::addBoardState(const std::string &in_fen, const std::string 
 	boardStates.add(newState);
 	setColour(3, Colours::white);
 	addAndMakeVisible(*newState);
+	newState->setColour(TextButton::buttonColourId, Colours::transparentWhite);
+	newState->setColour(TextButton::buttonOnColourId, Colours::white);
+
 	resized();
 
 	auto mainComponent = findParentComponentOfClass <MainComponent>();

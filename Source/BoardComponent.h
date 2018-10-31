@@ -36,6 +36,7 @@ public:
 	void paint(Graphics& g) override;
 	std::string GetFEN() { return fen; }
 	void UpdateState(const std::string in_algebraic, const std::string in_fen) { algebraic = in_algebraic; fen = in_fen; }
+	//void SetActive(const bool inActive) { setToggleState(inActive, sendNotification); repaint(); }
 
 private:
 	size_t myIndex;
@@ -55,6 +56,18 @@ public:
 	void Reset() { boardStates.clear(); }
 	int GetNumberofMoves() { return int(((double)boardStates.size() / 2) + 0.6); }
 	BoardStateButton* GetNode(const size_t index) { return boardStates[index]; }
+	void SetActiveNode(const size_t newNode, const size_t oldNode) 
+	{ 
+		if (newNode != oldNode && newNode != 0 && oldNode != 0)
+		{
+			boardStates[newNode - 1]->setToggleState(true, sendNotification);
+			boardStates[oldNode - 1]->setToggleState(false, sendNotification);
+		}
+		if (newNode == 0 && oldNode != 0)
+			boardStates[oldNode - 1]->setToggleState(false, sendNotification);
+		if (oldNode == 0 && newNode != 0)
+			boardStates[newNode - 1]->setToggleState(true, sendNotification);
+	}
 	size_t GetBoardStatesSize() { return boardStates.size(); }
 	void UpdatePromotionNode(const std::string in_algebraic, const std::string in_fen)
 	{
@@ -79,7 +92,7 @@ public:
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { SetStateIndex(0);  movesComponent.Reset(); resized(); }
 	Board* GetBoard() { return myBoard; }
-	void SetStateIndex(const size_t in_dex) { currentState = in_dex; }
+	void SetStateIndex(const size_t in_dex) { movesComponent.SetActiveNode(in_dex, currentState); currentState = in_dex; }
 	size_t GetStateIndex() { return currentState; }
 	void UpdatePromotionNode() 
 	{ 

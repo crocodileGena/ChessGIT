@@ -2,6 +2,23 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "board.h"
 
+class DraggedPiece
+{
+public:
+	DraggedPiece() : draw(false), draggedImage(nullptr), position(0, 0) {}
+	void SetPosition(const Point<int> in_pos) { position = in_pos; }
+	Point<int> GetPosition() { return position; }
+	void SetImage(Image* in_image) { draggedImage = in_image; }
+	Image* GetImage() { return draggedImage; }
+	void SetDraw(const bool in_draw) { draw = in_draw; }
+	bool GetDraw() { return draw; }
+
+private:
+	bool draw;
+	Image* draggedImage;
+	Point<int> position;
+};
+
 class ResetButton : public TextButton
 {
 public:
@@ -149,15 +166,23 @@ public:
 	void paint(Graphics& g) override;
 	void resized() override;
 	void mouseDown(const MouseEvent &event) override;
+	void mouseUp(const MouseEvent &event) override;
+	void mouseDrag(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
 	void SetActiveSquare(const Square inSquare) { activeSquare = inSquare; }
 	void ResetClicked();
+	Image* BoardComponent::GetPieceImage(const Piece* currPiece);
+	void SetPressedAlreadySelected(const bool in_selected) { alreadySelected = in_selected; }
+	bool GetPressedAlreadySelected() { return alreadySelected; }
+
 private:
 	Board* myBoard;
 	Square activeSquare;
 	Square queeningSquare;
 	QueeningComponent whiteQueeningComponent;
 	QueeningComponent blackQueeningComponent;
+	DraggedPiece draggedPiece;
+	bool alreadySelected;
 
 	Image background;
 	Image blackBackground;

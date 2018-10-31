@@ -97,7 +97,8 @@ BoardComponent::BoardComponent() :
 activeSquare(kIllegalSquare, kIllegalSquare),
 queeningSquare(kIllegalSquare, kIllegalSquare),
 blackQueeningComponent(false),
-whiteQueeningComponent(true)
+whiteQueeningComponent(true),
+alreadySelected(false)
 {
 	addChildComponent(whiteQueeningComponent);
 	addChildComponent(blackQueeningComponent);
@@ -197,36 +198,9 @@ void BoardComponent::paint(Graphics& g)
 		for (int i = 0; i < BoardSize; ++i)
 		{
 			Piece* currPiece = myBoard->GetPiece({ i,j });
-
 			if (currPiece)
 			{
-				int currWorth(currPiece->m_worth);
-				Color currColor = currPiece->m_color;
-				switch (currWorth)
-				{
-				case ePawn:
-					imageToDraw = currColor == eWhite ? &wPawn : &bPawn;
-					break;
-				case eKnight:
-				{
-					if (currPiece->m_name == "B")
-						imageToDraw = currColor == eWhite ? &wBishop : &bBishop;
-					else
-						imageToDraw = currColor == eWhite ? &wKnight : &bKnight;
-				}
-				break;
-				case eRook:
-					imageToDraw = currColor == eWhite ? &wRook : &bRook;
-					break;
-				case eQueen:
-					imageToDraw = currColor == eWhite ? &wQueen : &bQueen;
-					break;
-				case eKing:
-					imageToDraw = currColor == eWhite ? &wKing : &bKing;
-					break;
-				default:
-					continue;
-				}
+				imageToDraw = GetPieceImage(currPiece);
 				if (isBlackView)
 					g.drawImageAt(*imageToDraw, (7 - i) * 60 + drawOffset, j * 60 + drawOffset);
 				else
@@ -235,6 +209,9 @@ void BoardComponent::paint(Graphics& g)
 			else
 				imageToDraw = nullptr;
 		}
+
+	if (draggedPiece.GetDraw() && draggedPiece.GetImage())
+		g.drawImageAt(*draggedPiece.GetImage(), draggedPiece.GetPosition().getX(), draggedPiece.GetPosition().getY());
 
 	if (myBoard->GetQueeningMode())
 	{
@@ -263,6 +240,107 @@ void BoardComponent::paint(Graphics& g)
 	}
 }
 
+Image* BoardComponent::GetPieceImage(const Piece* currPiece)
+{
+	Image* imageToDraw;
+
+	if (currPiece)
+	{
+		int currWorth(currPiece->m_worth);
+		Color currColor = currPiece->m_color;
+		switch (currWorth)
+		{
+		case ePawn:
+			imageToDraw = currColor == eWhite ? &wPawn : &bPawn;
+			break;
+		case eKnight:
+		{
+			if (currPiece->m_name == "B")
+				imageToDraw = currColor == eWhite ? &wBishop : &bBishop;
+			else
+				imageToDraw = currColor == eWhite ? &wKnight : &bKnight;
+		}
+		break;
+		case eRook:
+			imageToDraw = currColor == eWhite ? &wRook : &bRook;
+			break;
+		case eQueen:
+			imageToDraw = currColor == eWhite ? &wQueen : &bQueen;
+			break;
+		case eKing:
+			imageToDraw = currColor == eWhite ? &wKing : &bKing;
+			break;
+		}
+	}
+	return imageToDraw;
+}
+
+void BoardComponent::mouseUp(const MouseEvent &event)
+{
+	MainComponent* mainComponent = findParentComponentOfClass<MainComponent>();
+	const bool isBlackView = mainComponent->IsBlackView();
+
+	Square origin({ activeSquare.GetFile(), activeSquare.GetRank() });
+	juce::Point<int> destPos = event.getPosition();
+
+	auto destX = (destPos.getX() - drawOffset) / 60;
+	auto destY = (destPos.getY() - drawOffset) / 60;
+
+	if (destPos.getX() - drawOffset < 0 || destPos.getY() - drawOffset < 0
+		|| destX > 7 || destX < 0 || destY > 7 || destY < 0)
+		destX = kIllegalSquare;
+
+	Square dest({ destX, 7 - destY });
+	if (isBlackView)
+		dest.SetSquare(7 - dest.GetFile(), 7 - dest.GetRank());
+
+	if (GetPressedAlreadySelected() && draggedPiece.GetDraw() == false)
+		activeSquare.SetFile(kIllegalSquare);
+
+	bool pieceMoved = false;
+	if (kIllegalSquare != activeSquare.GetFile())
+		pieceMoved = myBoard->MovePiece(origin, dest);
+
+	if (pieceMoved)
+	{
+		// get notation from board
+		auto newNode = myBoard->m_gameNotation.GetLastNode();
+		// pass it to GUI Notation
+		MainComponent *myParentComponent = dynamic_cast<MainComponent*>(getParentComponent());
+		NotationComponent *gameNotationComponent = myParentComponent->GetGameNotation();
+		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
+		gameNotationComponent->resized();
+		SetActiveSquare(dest);
+	}
+
+	if (myBoard->GetQueeningMode())
+	{
+		if (dest.GetRank() == Eight)
+			whiteQueeningComponent.SetQueeningSquare(dest);
+		else
+			blackQueeningComponent.SetQueeningSquare(dest);
+		queeningSquare = dest;
+	}
+
+	draggedPiece.SetDraw(false);
+	draggedPiece.SetImage(nullptr);
+	repaint();
+}
+
+void BoardComponent::mouseDrag(const MouseEvent &event)
+{
+	if (draggedPiece.GetImage())
+	{
+		juce::Point<int> currPos = event.getPosition();
+		currPos.setX(currPos.getX() - 30);
+		currPos.setY(currPos.getY() - 30);
+
+		draggedPiece.SetPosition(currPos);
+		draggedPiece.SetDraw(true);
+		repaint();
+	}
+}
+
 void BoardComponent::mouseDown(const MouseEvent &event)
 {
 	MainComponent* mainComponent = findParentComponentOfClass<MainComponent>();
@@ -278,17 +356,20 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		|| destX > 7 || destX < 0 || destY > 7 || destY < 0)
 		destX = kIllegalSquare;
 
-	Square dest({ destX, 7 -destY });
+	Square dest({ destX, 7 - destY });
 	if (isBlackView)
 		dest.SetSquare(7 - dest.GetFile(), 7 - dest.GetRank());
 
 	if (!myBoard->GetQueeningMode())
 	{
-		activeSquare.SetFile(dest.GetFile());
-		activeSquare.SetRank(dest.GetRank());
-
 		if (origin == dest)
-			activeSquare.SetFile(kIllegalSquare);
+			SetPressedAlreadySelected(true);
+		else
+		{
+			activeSquare.SetFile(dest.GetFile());
+			activeSquare.SetRank(dest.GetRank());
+			SetPressedAlreadySelected(false);
+		}
 	}
 
 	bool pieceMoved = false;
@@ -314,6 +395,11 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 			blackQueeningComponent.SetQueeningSquare(dest);
 		queeningSquare = dest;
 	}
+
+	draggedPiece.SetPosition({ destPos.getX() - 30, destPos.getY() });
+	Piece* currPiece = myBoard->GetPiece(dest);
+	Image* currPieceImage = GetPieceImage(currPiece);
+	draggedPiece.SetImage(currPieceImage);
 
 	repaint();
 }

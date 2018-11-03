@@ -547,9 +547,8 @@ void NotationComponent::addBoardState(const std::string &in_fen, const std::stri
 
 void MovesComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
-	static size_t currIndex = 1;
+	const size_t currIndex = boardStates.size() + 1;
 	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic, currIndex);
-	++currIndex;
 	boardStates.add(newState);
 	setColour(3, Colours::white);
 	addAndMakeVisible(*newState);

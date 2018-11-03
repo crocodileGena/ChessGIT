@@ -34,6 +34,52 @@ void RecursiveCheckCaptures(Board &board, Square source, int xDirection, int yDi
 	
 }
 
+Piece* Piece::NewPiece(const Pieces which_piece)
+{
+	Piece* retVal = nullptr;
+	switch (which_piece)
+	{
+	case whitePawn:
+		retVal = new Pawn(eWhite);
+		break;
+	case whiteKnight:
+		retVal = new Knight(eWhite);
+		break;
+	case whiteBishop:
+		retVal = new Bishop(eWhite);
+		break;
+	case whiteRook:
+		retVal = new Rook(eWhite);
+		break;
+	case whiteQueen:
+		retVal = new Queen(eWhite);
+		break;
+	case whiteKing:
+		retVal = new King(eWhite);
+	case blackPawn:
+		retVal = new Pawn(eBlack);
+		break;
+	case blackKnight:
+		retVal = new Knight(eBlack);
+		break;
+	case blackBishop:
+		retVal = new Bishop(eBlack);
+		break;
+	case blackRook:
+		retVal = new Rook(eBlack);
+		break;
+	case blackQueen:
+		retVal = new Queen(eBlack);
+		break;
+	case blackKing:
+		retVal = new King(eBlack);
+		break;
+	default:
+		retVal = nullptr;
+	}
+	return retVal;
+}
+
 std::vector<Piece*> DiagonalsCaptures(Board &board, Square source, Color canCaptureColor)
 {
 	std::vector<Piece*> retVal;

@@ -143,4 +143,20 @@ enum Worth
 	eKing = 0
 };
 
+enum Pieces
+{
+	noPiece = 0,
+	whitePawn,
+	whiteKnight,
+	whiteBishop,
+	whiteRook,
+	whiteQueen,
+	whiteKing,
+	blackPawn,
+	blackKnight,
+	blackBishop,
+	blackRook,
+	blackQueen,
+	blackKing
+};
 

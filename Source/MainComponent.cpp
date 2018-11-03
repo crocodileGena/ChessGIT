@@ -13,17 +13,30 @@ boardGUI(),
 gameNotation(boardGUI.GetBoard()),
 resetBoard(boardGUI.GetBoard()),
 boardStatus(boardGUI.GetBoard()),
-flipBoard("Black View")
+flipBoard("Black View"),
+editModeToggle("Edit Board")
 {
 	addAndMakeVisible(boardGUI);
 	addAndMakeVisible(resetBoard);
 	addAndMakeVisible(boardStatus);
 	addAndMakeVisible(gameNotation);
 	addAndMakeVisible(flipBoard);
+	addAndMakeVisible(editModeToggle);
+	addAndMakeVisible(piecesInventory);
+
+	editModeToggle.setColour(TextButton::buttonColourId, Colours::transparentWhite);
+	editModeToggle.setColour(TextButton::buttonOnColourId, Colours::white);
 
 	resetBoard.onClick = [this] { boardGUI.ResetClicked(); GetGameNotation()->Reset(); };
 	flipBoard.onClick = [this] {boardGUI.repaint(); };
-	//flipBoard.setClickingTogglesState(true);
+	editModeToggle.onClick = [this] 
+	{
+		gameNotation.setVisible(!editModeToggle.getToggleState()); 
+		piecesInventory.setVisible(editModeToggle.getToggleState());
+		boardGUI.SetCurrentEditPiece(noPiece);
+		boardGUI.repaint();
+	};
+	
 
     setSize (800, 600);
 }
@@ -46,9 +59,15 @@ void MainComponent::resized()
     // update their positions.
 	boardGUI.setBounds(0, 0, 515, 515);
 	resetBoard.setBounds(550, 20, 100, 20);
+	editModeToggle.setBounds(670, 20, 100, 20);
 	flipBoard.setBounds(550, 50, 100, 20);
 	boardStatus.setBounds(20, 520, 100, 20);
 	gameNotation.setBounds(550, 100, 150, 400);	
+	piecesInventory.setBounds(550, 100, 150, 400);
+
+	const bool isEditMode = editModeToggle.getToggleState();
+	piecesInventory.setVisible(isEditMode);
+	gameNotation.setVisible(!isEditMode);
 }
 
 //==============================================================================

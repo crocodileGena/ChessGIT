@@ -11,6 +11,7 @@ class Piece
 public:
 	Piece(const Color in_color) : m_worth(0), m_color(in_color) {}
 	~Piece() {}
+	static Piece* NewPiece(const Pieces which_piece);
 
 	virtual void OnPieceMoved(Board& /*in_board*/) {};
 	virtual bool IsMoveLegal(Board &board, const Square source, const Square dest) = 0;

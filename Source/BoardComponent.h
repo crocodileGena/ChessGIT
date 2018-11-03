@@ -100,6 +100,30 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MovesComponent)
 };
 
+class PiecesInventory : public Component
+{
+public:
+	PiecesInventory();
+	void resized() override;
+	void paint(Graphics& g) override;
+
+private:
+	ImageButton whitePawnButton;
+	ImageButton whiteKnightButton;
+	ImageButton whiteBishopButton;
+	ImageButton whiteRookButton;
+	ImageButton whiteQueenButton;
+	ImageButton whiteKingButton;
+	ImageButton blackPawnButton;
+	ImageButton blackKnightButton;
+	ImageButton blackBishopButton;
+	ImageButton blackRookButton;
+	ImageButton blackQueenButton;
+	ImageButton blackKingButton;
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PiecesInventory)
+
+};
 class NotationComponent : public Component
 {
 public:
@@ -169,9 +193,13 @@ public:
 	void mouseUp(const MouseEvent &event) override;
 	void mouseDrag(const MouseEvent &event) override;
 	Board* GetBoard() { return myBoard; }
+	void SetBoard(Board* in_board) { myBoard = in_board; }
 	void SetActiveSquare(const Square inSquare) { activeSquare = inSquare; }
+	void SetCurrentEditPiece(const Pieces selectedPiece) { currentEditPiece = selectedPiece; }
+	Pieces GetCurrentEditPiece() const { return currentEditPiece; }
 	void ResetClicked();
-	Image* BoardComponent::GetPieceImage(const Piece* currPiece);
+	Image* GetPieceImage(const Piece* currPiece);
+	Image* GetPieceImage(const Pieces currPiece);
 	void SetPressedAlreadySelected(const bool in_selected) { alreadySelected = in_selected; }
 	bool GetPressedAlreadySelected() { return alreadySelected; }
 
@@ -183,6 +211,7 @@ private:
 	QueeningComponent blackQueeningComponent;
 	DraggedPiece draggedPiece;
 	bool alreadySelected;
+	Pieces currentEditPiece;
 
 	Image background;
 	Image blackBackground;

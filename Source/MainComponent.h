@@ -27,6 +27,7 @@ public:
     void resized() override;
 	NotationComponent* GetGameNotation() { return &gameNotation; }
 	BoardComponent* GetBoardComponent() { return &boardGUI; }
+	bool GetEditModeState() { return editModeToggle.getToggleState(); }
 	bool IsBlackView() { return flipBoard.getToggleState(); }
 
 private:
@@ -37,7 +38,8 @@ private:
 	ResetButton resetBoard;
 	ToggleButton flipBoard;
 	StatusComponent boardStatus;
-
+	ToggleButton editModeToggle;
+	PiecesInventory piecesInventory;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
 

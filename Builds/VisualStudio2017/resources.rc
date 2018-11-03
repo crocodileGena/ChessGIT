@@ -16,7 +16,7 @@ BEGIN
       VALUE "FileDescription",  "ChessGUI\0"
       VALUE "FileVersion",  "1.0.0\0"
       VALUE "ProductName",  "ChessGUI\0"
-      VALUE "ProductVersion",  "1.0.7\0"
+      VALUE "ProductVersion",  "1.0.8\0"
     END
   END
 

@@ -17,7 +17,7 @@ public:
 	virtual bool IsMoveLegal(Board &board, const Square source, const Square dest) = 0;
 	virtual std::vector<Piece*> CanPieceCapture(Board &board, const Square source) = 0;
 	virtual bool isEnPassantMove(const Color /*in_color*/, const Square /*in_source*/, const Square /*in_dest*/) { return false; }
-	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin, const bool checkUndefendend = true);
+	std::vector<Move> GetLegalMoves(const Board& in_board, const Square origin);
 	virtual std::vector<Move> GetLegalMovesSelf(const Board& in_board, const Square origin) = 0;
 
 	int m_worth;

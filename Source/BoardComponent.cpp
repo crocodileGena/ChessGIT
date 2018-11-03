@@ -289,7 +289,7 @@ void BoardComponent::paint(Graphics& g)
 
 Image* BoardComponent::GetPieceImage(const Piece* currPiece)
 {
-	Image* imageToDraw;
+	Image* imageToDraw = nullptr;
 
 	if (currPiece)
 	{

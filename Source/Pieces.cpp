@@ -2,16 +2,21 @@
 #include "Pieces.h"
 #include <stdlib.h>
 
-std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin, const bool checkUnefendend)
+std::vector<Move> Piece::GetLegalMoves(const Board& in_board, const Square origin)
 {
 	auto checkOrMate = in_board.GetCheckOrMate();
 	std::vector<Move> retVal;
+	static bool recursiveCheck = true;
 	if ( (checkOrMate == eNone || checkOrMate == eCheck) && 
 		in_board.m_gameNotation.GetNumberOfNodes() == in_board.GetCurrentNotationIndex())
 	{
 		retVal = GetLegalMovesSelf(in_board, origin);
-		if (checkUnefendend)
+		if (recursiveCheck)
+		{
+			recursiveCheck = false;
 			in_board.RemoveUndefendedCheckMoves(retVal);
+			recursiveCheck = true;
+		}
 	}
 	return retVal;
 }
@@ -694,10 +699,7 @@ std::vector<Piece*> Queen::CanPieceCapture(Board &board, const Square source)
 std::vector<Piece*> King::CanPieceCapture(Board &board, const Square source)
 {
 	std::vector<Piece*> retVal;
-	static int recursive = 0;
-	++recursive;
-	auto legalMoves = GetLegalMoves(board, source, recursive > 1 ? false : true);
-	--recursive;
+	auto legalMoves = GetLegalMoves(board, source);
 	for (auto legalMove : legalMoves)
 	{
 		Piece* destPiece = board.GetPiece(legalMove.m_dest);

@@ -339,7 +339,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			CommitMove(currPiece, inBase, inDest);
 
 			//if queened a pawn
-			if (inDest.GetRank() == (currPiece->m_color == eWhite ? Eight : One))
+			if (currPiece->m_name == "P" && inDest.GetRank() == (currPiece->m_color == eWhite ? Eight : One))
 				SetQueeningMode(true);
 
 			const std::string piecesPosition = GetPiecesPosition();

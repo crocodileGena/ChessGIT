@@ -111,6 +111,19 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MovesComponent)
 };
 
+class ImageButtonSelection : public ImageButton
+{
+public:
+	ImageButtonSelection();
+	void mouseDown(const MouseEvent &event) override;
+	void paint(Graphics& g) override;
+private:
+	static int current_selection;
+	int my_selection = 0;
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ImageButtonSelection)
+};
+
 class PiecesInventory : public Component
 {
 public:
@@ -119,18 +132,18 @@ public:
 	void paint(Graphics& g) override;
 
 private:
-	ImageButton whitePawnButton;
-	ImageButton whiteKnightButton;
-	ImageButton whiteBishopButton;
-	ImageButton whiteRookButton;
-	ImageButton whiteQueenButton;
-	ImageButton whiteKingButton;
-	ImageButton blackPawnButton;
-	ImageButton blackKnightButton;
-	ImageButton blackBishopButton;
-	ImageButton blackRookButton;
-	ImageButton blackQueenButton;
-	ImageButton blackKingButton;
+	ImageButtonSelection whitePawnButton;
+	ImageButtonSelection whiteKnightButton;
+	ImageButtonSelection whiteBishopButton;
+	ImageButtonSelection whiteRookButton;
+	ImageButtonSelection whiteQueenButton;
+	ImageButtonSelection whiteKingButton;
+	ImageButtonSelection blackPawnButton;
+	ImageButtonSelection blackKnightButton;
+	ImageButtonSelection blackBishopButton;
+	ImageButtonSelection blackRookButton;
+	ImageButtonSelection blackQueenButton;
+	ImageButtonSelection blackKingButton;
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PiecesInventory)
 

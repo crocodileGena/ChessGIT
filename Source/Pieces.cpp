@@ -61,6 +61,7 @@ Piece* Piece::NewPiece(const Pieces which_piece)
 		break;
 	case whiteKing:
 		retVal = new King(eWhite);
+		break;
 	case blackPawn:
 		retVal = new Pawn(eBlack);
 		break;

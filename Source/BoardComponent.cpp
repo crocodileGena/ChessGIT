@@ -2,6 +2,8 @@
 #include "Pieces.h"
 #include "MainComponent.h"
 
+int ImageButtonSelection::current_selection = 0;
+
 int drawOffset = 18;
 
 void QueeningComponent::paint(Graphics& g)
@@ -260,6 +262,7 @@ void BoardComponent::paint(Graphics& g)
 	if (draggedPiece.GetDraw() && draggedPiece.GetImage())
 		g.drawImageAt(*draggedPiece.GetImage(), draggedPiece.GetPosition().getX(), draggedPiece.GetPosition().getY());
 
+	MainComponent *myParentComponent = dynamic_cast<MainComponent*>(getParentComponent());
 	if (myBoard->GetQueeningMode())
 	{
 		if (queeningSquare.GetRank() == Eight)
@@ -267,7 +270,7 @@ void BoardComponent::paint(Graphics& g)
 		else
 			blackQueeningComponent.setVisible(true);
 	}
-	else if (activeSquare.GetFile() != kIllegalSquare)
+	else if ((activeSquare.GetFile() != kIllegalSquare) && !myParentComponent->GetEditModeState())
 	{
 		const Square mySquare = { activeSquare.GetFile(), activeSquare.GetRank() };
 		Piece* myPiece = myBoard->GetPiece(mySquare);
@@ -656,29 +659,29 @@ void PiecesInventory::resized()
 	Image blackKingImage = *boardComponent->GetPieceImage(Pieces::blackKing);
 	 
 	whitePawnButton.setImages(true, false, true, whitePawnImage, 0.8f, Colours::transparentBlack, whitePawnImage,
-		1.0f, Colours::transparentBlack, whitePawnImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whitePawnImage, 1.0f, Colours::transparentBlack);
 	blackPawnButton.setImages(true, false, true, blackPawnImage, 0.8f, Colours::transparentBlack, blackPawnImage,
-		1.0f, Colours::transparentBlack, blackPawnImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackPawnImage, 1.0f, Colours::transparentBlack);
 	whiteKnightButton.setImages(true, false, true, whiteKnightImage, 0.8f, Colours::transparentBlack, whiteKnightImage,
-		1.0f, Colours::transparentBlack, whiteKnightImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whiteKnightImage, 1.0f, Colours::transparentBlack);
 	blackKnightButton.setImages(true, false, true, blackKnightImage, 0.8f, Colours::transparentBlack, blackKnightImage,
-		1.0f, Colours::transparentBlack, blackKnightImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackKnightImage, 1.0f, Colours::transparentBlack);
 	whiteBishopButton.setImages(true, false, true, whiteBishopImage, 0.8f, Colours::transparentBlack, whiteBishopImage,
-		1.0f, Colours::transparentBlack, whiteBishopImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whiteBishopImage, 1.0f, Colours::transparentBlack);
 	blackBishopButton.setImages(true, false, true, blackBishopImage, 0.8f, Colours::transparentBlack, blackBishopImage,
-		1.0f, Colours::transparentBlack, blackBishopImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackBishopImage, 1.0f, Colours::transparentBlack);
 	whiteRookButton.setImages(true, false, true, whiteRookImage, 0.8f, Colours::transparentBlack, whiteRookImage,
-		1.0f, Colours::transparentBlack, whiteRookImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whiteRookImage, 1.0f, Colours::transparentBlack);
 	blackRookButton.setImages(true, false, true, blackRookImage, 0.8f, Colours::transparentBlack, blackRookImage,
-		1.0f, Colours::transparentBlack, blackRookImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackRookImage, 1.0f, Colours::transparentBlack);
 	whiteQueenButton.setImages(true, false, true, whiteQueenImage, 0.8f, Colours::transparentBlack, whiteQueenImage,
-		1.0f, Colours::transparentBlack, whiteQueenImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whiteQueenImage, 1.0f, Colours::transparentBlack);
 	blackQueenButton.setImages(true, false, true, blackQueenImage, 0.8f, Colours::transparentBlack, blackQueenImage,
-		1.0f, Colours::transparentBlack, blackQueenImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackQueenImage, 1.0f, Colours::transparentBlack);
 	whiteKingButton.setImages(true, false, true, whiteKingImage, 0.8f, Colours::transparentBlack, whiteKingImage,
-		1.0f, Colours::transparentBlack, whiteKingImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, whiteKingImage, 1.0f, Colours::transparentBlack);
 	blackKingButton.setImages(true, false, true, blackKingImage, 0.8f, Colours::transparentBlack, blackKingImage,
-		1.0f, Colours::transparentBlack, blackKingImage, 0.8f, Colours::transparentBlack);
+		1.0f, Colours::transparentBlack, blackKingImage, 1.0f, Colours::transparentBlack);
 
 	whitePawnButton.onClick = [this, boardComponent] { boardComponent->SetCurrentEditPiece(Pieces::whitePawn); };
 	whiteKnightButton.onClick = [this, boardComponent] { boardComponent->SetCurrentEditPiece(Pieces::whiteKnight); };
@@ -791,4 +794,26 @@ void BoardStateButton::paint(Graphics& g)
 	TextButton::paint(g);
 	g.setColour(Colours::grey);
 	g.drawText(getName(), getLocalBounds(), Justification::centred, true);
+}
+
+ImageButtonSelection::ImageButtonSelection()
+{
+	my_selection = current_selection++;
+}
+
+void ImageButtonSelection::paint(Graphics& g)
+{
+	ImageButton::paint(g);
+	if (current_selection == my_selection)
+	{
+		g.setColour(Colours::red);
+		Rectangle<int> pointArea(10, 10);
+		g.fillRect(pointArea);
+	}
+}
+
+void ImageButtonSelection::mouseDown(const MouseEvent &event)
+{
+	current_selection = my_selection;
+	ImageButton::mouseDown(event);
 }

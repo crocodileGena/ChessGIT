@@ -10,7 +10,7 @@ class Piece
 {
 public:
 	Piece(const Color in_color) : m_worth(0), m_color(in_color) {}
-	~Piece() {}
+	virtual ~Piece() {}
 	static Piece* NewPiece(const Pieces which_piece);
 
 	virtual void OnPieceMoved(Board& /*in_board*/) {};

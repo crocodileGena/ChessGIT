@@ -13,12 +13,14 @@ boardGUI(),
 gameNotation(boardGUI.GetBoard()),
 resetBoard(boardGUI.GetBoard()),
 boardStatus(boardGUI.GetBoard()),
+boardBalance(boardGUI.GetBoard()),
 flipBoard("Black View"),
 editModeToggle("Edit Board")
 {
 	addAndMakeVisible(boardGUI);
 	addAndMakeVisible(resetBoard);
 	addAndMakeVisible(boardStatus);
+	addAndMakeVisible(boardBalance);
 	addAndMakeVisible(gameNotation);
 	addAndMakeVisible(flipBoard);
 	addAndMakeVisible(editModeToggle);
@@ -62,6 +64,7 @@ void MainComponent::resized()
 	editModeToggle.setBounds(670, 20, 100, 20);
 	flipBoard.setBounds(550, 50, 100, 20);
 	boardStatus.setBounds(20, 520, 100, 20);
+	boardBalance.setBounds(20, 540, 100, 20);
 	gameNotation.setBounds(550, 100, 150, 400);	
 	piecesInventory.setBounds(550, 100, 150, 400);
 

@@ -358,6 +358,7 @@ void BoardComponent::mouseUp(const MouseEvent &event)
 		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
 		gameNotationComponent->resized();
 		SetActiveSquare(dest);
+		myParentComponent->RepaintBalance();
 	}
 
 	if (myBoard->GetQueeningMode())
@@ -442,6 +443,7 @@ void BoardComponent::mouseDown(const MouseEvent &event)
 		NotationComponent *gameNotationComponent = myParentComponent->GetGameNotation();
 		gameNotationComponent->addBoardState(newNode.GetFEN(), newNode.GetAlgebraic());
 		gameNotationComponent->resized();
+		myParentComponent->RepaintBalance();
 	}
 
 	if (myBoard->GetQueeningMode())
@@ -490,6 +492,16 @@ void StatusComponent::paint(Graphics& g)
 	auto currStatus= myBoard->GetStatus();
 	g.setColour(Colours::white);
 	g.drawText(currStatus, getLocalBounds(), Justification::centred, true);
+}
+
+void BalanceComponent::paint(Graphics& g)
+{
+	auto currBalance = myBoard->GetBalance();
+	g.setColour(Colours::white);
+
+	std::string sign = currBalance > 0 ? "white: +" : "white: ";
+	if (currBalance != 0)
+		g.drawText(sign + std::to_string(currBalance), getLocalBounds(), Justification::centred, true);
 }
 
 NotationComponent::NotationComponent(Board* inBoard) : 

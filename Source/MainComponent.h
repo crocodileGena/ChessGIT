@@ -29,17 +29,19 @@ public:
 	BoardComponent* GetBoardComponent() { return &boardGUI; }
 	bool GetEditModeState() { return editModeToggle.getToggleState(); }
 	bool IsBlackView() { return flipBoard.getToggleState(); }
+	void RepaintBalance() { boardBalance.repaint(); }
 
 private:
     //==============================================================================
     // Your private member variables go here...
-	BoardComponent boardGUI;
-	NotationComponent gameNotation;
-	ResetButton resetBoard;
-	ToggleButton flipBoard;
-	StatusComponent boardStatus;
-	ToggleButton editModeToggle;
-	PiecesInventory piecesInventory;
+	BoardComponent		boardGUI;
+	NotationComponent	gameNotation;
+	ResetButton			resetBoard;
+	ToggleButton		flipBoard;
+	StatusComponent		boardStatus;
+	BalanceComponent	boardBalance;
+	ToggleButton		editModeToggle;
+	PiecesInventory		piecesInventory;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
 

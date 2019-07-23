@@ -42,6 +42,17 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StatusComponent)
 };
 
+class BalanceComponent : public Component
+{
+public:
+	BalanceComponent(Board* inBoard) : myBoard(inBoard) {}
+	void paint(Graphics& g) override;
+private:
+	Board* myBoard;
+	//==============================================================================
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BalanceComponent)
+};
+
 class BoardStateButton : public TextButton
 {
 public:
@@ -124,6 +135,7 @@ private:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PiecesInventory)
 
 };
+
 class NotationComponent : public Component
 {
 public:

@@ -39,6 +39,7 @@ struct Move
 	Square m_origin;
 	Square m_dest;
 };
+
 class NotationNode
 {
 public:
@@ -129,10 +130,12 @@ public:
 	std::string GetPiecesPosition();
 	std::vector<Move> GetLegalMoves(Color for_which_color);
 	size_t GetCurrentNotationIndex() const { return m_currNotationIndex; }
+	int  GetBalance() { return m_balance; }
 
 	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
 	void SetCheckOrMate(CheckOrMate in_checkormate) { m_checkOrMate = in_checkormate; }
+	void SetBalance(const int in_balance) { m_balance = in_balance; }
 
 	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);
 	void UpdateHalfmoveClock(const bool isCapture, const bool isPawn);
@@ -140,14 +143,17 @@ public:
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
 	void LoadFEN(const std::string in_position = fenOpening, const size_t nodeNumber = 1);
+	int	 CalculateBalance();
 
-	Color m_lastColorMoved;
-	Piece* board[BoardSize][BoardSize];
-	GameNotation m_gameNotation;
-	std::string m_status;
-	bool m_castlingFlag[numCastlingOptions];
-	int m_halfmoveClock;
-	bool m_queeningMode;
+	Color			m_lastColorMoved;
+	Piece*			board[BoardSize][BoardSize];
+	GameNotation	m_gameNotation;
+	std::string		m_status;
+	bool			m_castlingFlag[numCastlingOptions];
+	int				m_halfmoveClock;
+	bool			m_queeningMode;
+	int				m_balance = 0;
+
 private:
 	void CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
 	void UpdateEnPassantSquare(Piece * currPiece, const Square & inBase, const Square & inDest);

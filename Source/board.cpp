@@ -12,7 +12,8 @@ m_queeningMode(in_board.m_queeningMode),
 m_enPassantSquare(in_board.m_enPassantSquare),
 m_gameNotation(in_board.m_gameNotation),
 m_checkOrMate(in_board.m_checkOrMate),
-m_currNotationIndex(in_board.m_currNotationIndex)
+m_currNotationIndex(in_board.m_currNotationIndex),
+m_balance(in_board.m_balance)
 {
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
@@ -47,7 +48,7 @@ void Board::PiecesSum(int& whiteSum, int& blackSum)
 
 Board::Board() : 
 m_lastColorMoved(eBlack), 
-m_status("status bar"),
+m_status(""),
 m_halfmoveClock(0),
 m_queeningMode(false),
 m_checkOrMate(eNone),
@@ -62,11 +63,12 @@ m_currNotationIndex(0)
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;
 }
+
 void Board::ResetBoard()
 {
 	m_lastColorMoved = eBlack;
 	m_queeningMode = false;
-	m_status = "status bar";
+	m_status = "status bar2";
 	m_halfmoveClock = 0;
 	m_gameNotation.Reset();
 	SetCheckOrMate(eNone);
@@ -156,6 +158,7 @@ void Board::RemovePieces()
 		}
 	}
 }
+
 void Board::LoadFEN(const std::string in_fen, const size_t nodeNumber)
 {
 	RemovePieces();
@@ -319,7 +322,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			const Square enPassantDestSquare = GetEnPassantSquare();
 			const bool isCapture = GetPiece(inDest) != nullptr || enPassantDestSquare == inDest;
 			bool specifyRank = false; //TODO : Implement this
-			bool specifyFile = false; //ToDO : Implement this
+			bool specifyFile = false; //TODO : Implement this
 			const bool whitesMove = currPiece->m_color == eBlack;
 			const bool* castlingOptions = GetCastlingFlag();
 
@@ -335,9 +338,11 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 				}
 			}
 
+			// make the move
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
 
+			// update everything
 			//if queened a pawn
 			if (currPiece->m_name == "P" && inDest.GetRank() == (currPiece->m_color == eWhite ? Eight : One))
 				SetQueeningMode(true);
@@ -351,7 +356,8 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 			UpdateEnPassantSquare(currPiece, inBase, inDest);
-
+			const int currentBalance = CalculateBalance();
+			SetBalance(currentBalance);
 		}
 	}
 	if (!isPieceMoved)
@@ -770,4 +776,23 @@ Piece* Board::GetPiece(const Square inLocation) const
 		return nullptr;
 		
 	return board[inLocation.GetFile()][inLocation.GetRank()];
+}
+
+int Board::CalculateBalance()
+{
+	int retVal(0);
+
+	for (int i = 0; i < BoardSize; ++i)
+	{
+		for (int j = 0; j < BoardSize; ++j)
+		{
+			Piece* currPiece = GetPiece({ i,j });
+			if (currPiece != nullptr)
+			{
+				const int sign = currPiece->m_color == eWhite ? 1 : -1;
+				retVal += sign*currPiece->m_worth;
+			}
+		}
+	}
+	return retVal;
 }

@@ -134,7 +134,7 @@ public:
 
 	void SetEnPassantSquare(const Square in_square) { m_enPassantSquare = in_square; }
 	void SetQueeningMode(const bool in_queeningMode) { m_queeningMode = in_queeningMode; }
-	void SetCheckOrMate(CheckOrMate in_checkormate) { m_checkOrMate = in_checkormate; }
+	void SetCheckOrMate(CheckOrMate in_checkormate) { m_checkOrMate = in_checkormate; m_status = in_checkormate == eCheck? "Check" :"Mate"; }
 	void SetBalance(const int in_balance) { m_balance = in_balance; }
 
 	void UpdateCastlingFlag(const Piece* in_piece, const Square in_origin);

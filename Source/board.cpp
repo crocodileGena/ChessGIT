@@ -68,11 +68,12 @@ void Board::ResetBoard()
 {
 	m_lastColorMoved = eBlack;
 	m_queeningMode = false;
-	m_status = "status bar2";
+	m_status = "Game Started";
 	m_halfmoveClock = 0;
 	m_gameNotation.Reset();
 	SetCheckOrMate(eNone);
 	m_currNotationIndex = 0;
+	m_balance = 0;
 
 	for (int i = 0; i < numCastlingOptions; ++i)
 		m_castlingFlag[i] = true;
@@ -341,7 +342,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 			// make the move
 			isPieceMoved = true;
 			CommitMove(currPiece, inBase, inDest);
-
+			m_status = "Moved from " + inBase.toString() + " to " + inDest.toString();
 			// update everything
 			//if queened a pawn
 			if (currPiece->m_name == "P" && inDest.GetRank() == (currPiece->m_color == eWhite ? Eight : One))
@@ -749,7 +750,10 @@ bool Board::CheckIsMate()
 	std::vector<Move> legalMoves = GetLegalMoves(for_which_color);
 	
 	if (legalMoves.empty())
+	{
+		m_status = "Mate";
 		retVal = true;
+	}
 
 	return retVal;
 }

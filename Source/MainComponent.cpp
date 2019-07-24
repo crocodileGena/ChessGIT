@@ -29,7 +29,7 @@ editModeToggle("Edit Board")
 	editModeToggle.setColour(TextButton::buttonColourId, Colours::transparentWhite);
 	editModeToggle.setColour(TextButton::buttonOnColourId, Colours::white);
 
-	resetBoard.onClick = [this] { boardGUI.ResetClicked(); GetGameNotation()->Reset(); };
+	resetBoard.onClick = [this] { boardGUI.ResetClicked(); GetGameNotation()->Reset(); boardBalance.repaint(); };
 	flipBoard.onClick = [this] {boardGUI.repaint(); };
 	editModeToggle.onClick = [this] 
 	{
@@ -63,7 +63,7 @@ void MainComponent::resized()
 	resetBoard.setBounds(550, 20, 100, 20);
 	editModeToggle.setBounds(670, 20, 100, 20);
 	flipBoard.setBounds(550, 50, 100, 20);
-	boardStatus.setBounds(20, 520, 100, 20);
+	boardStatus.setBounds(20, 520, 1000, 20);
 	boardBalance.setBounds(20, 540, 100, 20);
 	gameNotation.setBounds(550, 100, 150, 400);	
 	piecesInventory.setBounds(550, 100, 150, 400);

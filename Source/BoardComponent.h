@@ -221,6 +221,7 @@ public:
 	void SetBoard(Board* in_board) { myBoard = in_board; }
 	void SetActiveSquare(const Square inSquare) { activeSquare = inSquare; }
 	void SetCurrentEditPiece(const Pieces selectedPiece) { currentEditPiece = selectedPiece; }
+	bool SetEditMode(const bool in_isEditMode);
 	Pieces GetCurrentEditPiece() const { return currentEditPiece; }
 	void ResetClicked();
 	Image* GetPieceImage(const Piece* currPiece);
@@ -229,14 +230,15 @@ public:
 	bool GetPressedAlreadySelected() { return alreadySelected; }
 
 private:
-	Board* myBoard;
-	Square activeSquare;
-	Square queeningSquare;
-	QueeningComponent whiteQueeningComponent;
-	QueeningComponent blackQueeningComponent;
-	DraggedPiece draggedPiece;
-	bool alreadySelected;
-	Pieces currentEditPiece;
+	Board*					myBoard;
+	Square					activeSquare;
+	Square					queeningSquare;
+	QueeningComponent		whiteQueeningComponent;
+	QueeningComponent		blackQueeningComponent;
+	DraggedPiece			draggedPiece;
+	bool					alreadySelected;
+	Pieces					currentEditPiece;
+	bool					isEditMode = false;
 
 	Image background;
 	Image blackBackground;

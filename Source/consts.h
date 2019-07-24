@@ -133,15 +133,12 @@ enum CheckOrMate
 	eDraw
 };
 
-enum Worth
-{
-	ePawn = 1,
-	eBishop = 3,
-	eKnight = 3,
-	eRook = 5,
-	eQueen = 9,
-	eKing = 0
-};
+const int kPawnWorth = 1;
+const int kBishopWorth = 3;
+const int kKnightWorth = 3;
+const int kRookWorth = 5;
+const int kQueenWorth = 9;
+const int kKingWorth = 0;
 
 enum Pieces
 {

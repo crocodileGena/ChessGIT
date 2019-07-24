@@ -33,12 +33,21 @@ editModeToggle("Edit Board")
 	flipBoard.onClick = [this] {boardGUI.repaint(); };
 	editModeToggle.onClick = [this] 
 	{
-		gameNotation.setVisible(!editModeToggle.getToggleState()); 
-		piecesInventory.setVisible(editModeToggle.getToggleState());
-		boardGUI.GetBoard()->UpdateBalance();
-		boardGUI.SetCurrentEditPiece(noPiece);
-		boardGUI.repaint();
-		boardBalance.repaint();
+		const bool isEditMode = editModeToggle.getToggleState();
+		const bool accepted = boardGUI.SetEditMode(isEditMode);
+		if (!isEditMode && !accepted)
+			editModeToggle.setToggleState(true, dontSendNotification);
+		else
+		{
+			gameNotation.setVisible(!isEditMode);
+			piecesInventory.setVisible(isEditMode);
+		
+			boardGUI.GetBoard()->UpdateBalance();
+			boardGUI.SetCurrentEditPiece(noPiece);
+			boardGUI.repaint();
+			boardBalance.repaint();
+		}
+		boardStatus.repaint();
 	};
 	
 

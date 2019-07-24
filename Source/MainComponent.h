@@ -27,7 +27,6 @@ public:
     void resized() override;
 	NotationComponent* GetGameNotation() { return &gameNotation; }
 	BoardComponent* GetBoardComponent() { return &boardGUI; }
-	bool GetEditModeState() { return editModeToggle.getToggleState(); }
 	bool IsBlackView() { return flipBoard.getToggleState(); }
 	void RepaintBalance() { boardBalance.repaint(); }
 	void RepaintStatus() { boardStatus.repaint(); }

@@ -245,25 +245,25 @@ std::string Board::GetPiecesPosition()
 void Board::UpdateCastlingFlag(const Piece* in_piece, const Square in_origin)
 {
 	int piece = in_piece->m_worth;
-	if (piece != eKing && piece != eRook)
+	if (piece != kKingWorth && piece != kRookWorth)
 		return;
-	if (in_piece->m_color == eWhite && piece == eKing)
+	if (in_piece->m_color == eWhite && piece == kKingWorth)
 	{
 		m_castlingFlag[whiteShort] = false;
 		m_castlingFlag[whiteLong] = false;
 	}
-	else if (in_piece->m_color == eWhite && piece == eRook && in_origin.GetFile() == A)
+	else if (in_piece->m_color == eWhite && piece == kRookWorth && in_origin.GetFile() == A)
 		m_castlingFlag[whiteLong] = false;
-	else if (in_piece->m_color == eWhite && piece == eRook && in_origin.GetFile() == H)
+	else if (in_piece->m_color == eWhite && piece == kRookWorth && in_origin.GetFile() == H)
 		m_castlingFlag[whiteShort] = false;
-	else if (in_piece->m_color == eBlack && piece == eKing)
+	else if (in_piece->m_color == eBlack && piece == kKingWorth)
 	{
 		m_castlingFlag[blackShort] = false;
 		m_castlingFlag[blackLong] = false;
 	}
-	else if (in_piece->m_color == eBlack && piece == eRook && in_origin.GetFile() == A)
+	else if (in_piece->m_color == eBlack && piece == kRookWorth && in_origin.GetFile() == A)
 		m_castlingFlag[blackLong] = false;
-	else if (in_piece->m_color == eBlack && piece == eRook && in_origin.GetFile() == H)
+	else if (in_piece->m_color == eBlack && piece == kRookWorth && in_origin.GetFile() == H)
 		m_castlingFlag[blackShort] = false;
 
 }
@@ -349,7 +349,7 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 				SetQueeningMode(true);
 
 			const std::string piecesPosition = GetPiecesPosition();
-			UpdateHalfmoveClock(isCapture, currPiece->m_worth == ePawn);
+			UpdateHalfmoveClock(isCapture, currPiece->m_worth == kPawnWorth);
 			SetCheckOrMate(DeriveCheckOrMate(piecesPosition));
 			UpdateCastlingFlag(currPiece, inBase);
 			m_lastColorMoved = currPiece->m_color;
@@ -392,6 +392,41 @@ void Board::SetCheckOrMate(CheckOrMate in_checkormate)
 	}
 }
 
+bool Board::CanAcceptPosition()
+{
+	bool retVal = true;
+
+	// if not exactly one king for each color.
+	int whiteKingsCount = 0;
+	int blackKingsCount = 0;
+
+	for (int i = 0; i < BoardSize; ++i)
+	{
+		for (int j = 0; j < BoardSize; ++j)
+		{
+			Piece* currPiece = GetPiece({ i,j });
+			if (currPiece && (currPiece->m_worth == kKingWorth))
+			{
+				if (currPiece->m_color == eWhite)
+					++whiteKingsCount;
+				else
+					++blackKingsCount;
+			}
+		}
+	}
+
+	if (whiteKingsCount != 1 || blackKingsCount != 1)
+		retVal = false;
+	// if no legal moves
+	auto legalMoves = GetLegalMoves(m_lastColorMoved);
+	if (legalMoves.size() == 0)
+		retVal = false;
+
+	if (retVal == false)
+		m_status = "Cannot accept position";
+
+	return retVal;
+}
 CheckOrMate Board::DeriveCheckOrMate(const std::string piecesPosition)
 {
 	CheckOrMate retVal = eNone;

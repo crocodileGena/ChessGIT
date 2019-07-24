@@ -30,7 +30,7 @@ class Pawn : public Piece
 public:
 	Pawn(const Color in_color) : Piece(in_color)
 	{ 
-		m_worth = Worth::ePawn; m_name = "P";
+		m_worth = kPawnWorth; m_name = "P";
 	}
 	~Pawn() {}
 
@@ -44,7 +44,7 @@ public:
 class Bishop : public Piece
 {
 public:
-	Bishop(const Color in_color) : Piece(in_color) { m_worth = Worth::eBishop; m_name = "B"; }
+	Bishop(const Color in_color) : Piece(in_color) { m_worth = kBishopWorth; m_name = "B"; }
 	~Bishop() {}
 
 	bool IsMoveLegal(Board &board, const Square source, const Square dest) override;
@@ -55,7 +55,7 @@ public:
 class Knight : public Piece
 {
 public:
-	Knight(const Color in_color) : Piece(in_color) { m_worth = Worth::eKnight; m_name = "N";
+	Knight(const Color in_color) : Piece(in_color) { m_worth = kKnightWorth; m_name = "N";
 	}
 	~Knight() {}
 
@@ -67,7 +67,7 @@ public:
 class Rook : public Piece
 {
 public:
-	Rook(const Color in_color) : Piece(in_color), m_bCastleAllowed(true) { m_worth = Worth::eRook; m_name = "R";
+	Rook(const Color in_color) : Piece(in_color), m_bCastleAllowed(true) { m_worth = kRookWorth; m_name = "R";
 	}
 	~Rook() {}
 
@@ -82,7 +82,7 @@ public:
 class Queen : public Piece
 {
 public:
-	Queen(const Color in_color) : Piece(in_color) { m_worth = Worth::eQueen; m_name = "Q";
+	Queen(const Color in_color) : Piece(in_color) { m_worth = kQueenWorth; m_name = "Q";
 	}
 	~Queen() {}
 
@@ -98,7 +98,7 @@ public:
 		Piece(in_color),
 		m_bCastleAllowed(true),
 		m_castleRookSquare(kIllegalSquare, kIllegalSquare)
-	{ m_worth = Worth::eKing; m_name = "K";
+	{ m_worth = kKingWorth; m_name = "K";
 	}
 	~King() {}
 

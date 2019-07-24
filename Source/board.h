@@ -122,6 +122,7 @@ public:
 	bool CheckIsMate();
 	CheckOrMate DeriveCheckOrMate(const std::string piecesPosition);
 
+	bool CanAcceptPosition();
 	std::string GetStatus() { return m_status; }
 	CheckOrMate GetCheckOrMate() const { return m_checkOrMate; }
 	Square GetEnPassantSquare() const { return m_enPassantSquare; }

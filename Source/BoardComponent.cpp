@@ -226,7 +226,7 @@ void BoardComponent::paint(Graphics& g)
 	g.drawImageAt(isBlackView ? blackBackground : background, 0, 0);
 	Image* imageToDraw = nullptr;
 
-	if (activeSquare.GetFile() != kIllegalSquare && !mainComponent->GetEditModeState())
+	if (activeSquare.GetFile() != kIllegalSquare && !isEditMode)
 	{
 		int xOffset = 0;
 		int yOffset = 0;
@@ -270,7 +270,7 @@ void BoardComponent::paint(Graphics& g)
 		else
 			blackQueeningComponent.setVisible(true);
 	}
-	else if ((activeSquare.GetFile() != kIllegalSquare) && !myParentComponent->GetEditModeState())
+	else if ((activeSquare.GetFile() != kIllegalSquare) && !isEditMode)
 	{
 		const Square mySquare = { activeSquare.GetFile(), activeSquare.GetRank() };
 		Piece* myPiece = myBoard->GetPiece(mySquare);
@@ -300,10 +300,10 @@ Image* BoardComponent::GetPieceImage(const Piece* currPiece)
 		Color currColor = currPiece->m_color;
 		switch (currWorth)
 		{
-		case ePawn:
+		case kPawnWorth:
 			imageToDraw = currColor == eWhite ? &wPawn : &bPawn;
 			break;
-		case eKnight:
+		case kKnightWorth:
 		{
 			if (currPiece->m_name == "B")
 				imageToDraw = currColor == eWhite ? &wBishop : &bBishop;
@@ -311,18 +311,27 @@ Image* BoardComponent::GetPieceImage(const Piece* currPiece)
 				imageToDraw = currColor == eWhite ? &wKnight : &bKnight;
 		}
 		break;
-		case eRook:
+		case kRookWorth:
 			imageToDraw = currColor == eWhite ? &wRook : &bRook;
 			break;
-		case eQueen:
+		case kQueenWorth:
 			imageToDraw = currColor == eWhite ? &wQueen : &bQueen;
 			break;
-		case eKing:
+		case kKingWorth:
 			imageToDraw = currColor == eWhite ? &wKing : &bKing;
 			break;
 		}
 	}
 	return imageToDraw;
+}
+
+bool BoardComponent::SetEditMode(const bool in_isEditMode)
+{
+	const bool canAcceptPosition = myBoard->CanAcceptPosition();
+	if (canAcceptPosition)
+		isEditMode = in_isEditMode;
+
+	return canAcceptPosition;
 }
 
 void BoardComponent::mouseUp(const MouseEvent &event)

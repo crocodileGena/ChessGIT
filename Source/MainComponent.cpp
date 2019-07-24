@@ -35,8 +35,10 @@ editModeToggle("Edit Board")
 	{
 		gameNotation.setVisible(!editModeToggle.getToggleState()); 
 		piecesInventory.setVisible(editModeToggle.getToggleState());
+		boardGUI.GetBoard()->UpdateBalance();
 		boardGUI.SetCurrentEditPiece(noPiece);
 		boardGUI.repaint();
+		boardBalance.repaint();
 	};
 	
 

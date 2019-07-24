@@ -357,14 +357,39 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 				isCapture, specifyRank, specifyFile, whitesMove, castlingOptions,
 				enPassantDestSquare, m_halfmoveClock, GetCheckOrMate());
 			UpdateEnPassantSquare(currPiece, inBase, inDest);
-			const int currentBalance = CalculateBalance();
-			SetBalance(currentBalance);
+			UpdateBalance();
 		}
 	}
 	if (!isPieceMoved)
 		std::cout << "Illegal Move\n";
 
 	return isPieceMoved;
+}
+
+void Board::UpdateBalance()
+{
+	const int currentBalance = CalculateBalance();
+	SetBalance(currentBalance);
+}
+
+void Board::SetCheckOrMate(CheckOrMate in_checkormate)
+{ 
+	m_checkOrMate = in_checkormate;
+	switch (in_checkormate)
+	{
+		case eCheck:
+			m_status = "Check";
+			break;
+		case eMate:
+			m_status = "Mate";
+			break;
+		case eDraw:
+			m_status = "Draw";
+			break;
+		default:
+			//Do nothing
+			break;
+	}
 }
 
 CheckOrMate Board::DeriveCheckOrMate(const std::string piecesPosition)
@@ -782,7 +807,7 @@ Piece* Board::GetPiece(const Square inLocation) const
 	return board[inLocation.GetFile()][inLocation.GetRank()];
 }
 
-int Board::CalculateBalance()
+int Board::CalculateBalance() const
 {
 	int retVal(0);
 

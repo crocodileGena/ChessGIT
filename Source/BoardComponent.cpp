@@ -262,7 +262,6 @@ void BoardComponent::paint(Graphics& g)
 	if (draggedPiece.GetDraw() && draggedPiece.GetImage())
 		g.drawImageAt(*draggedPiece.GetImage(), draggedPiece.GetPosition().getX(), draggedPiece.GetPosition().getY());
 
-	MainComponent *myParentComponent = dynamic_cast<MainComponent*>(getParentComponent());
 	if (myBoard->GetQueeningMode())
 	{
 		if (queeningSquare.GetRank() == Eight)
@@ -573,7 +572,7 @@ void NotationComponent::addBoardState(const std::string &in_fen, const std::stri
 
 void MovesComponent::addBoardState(const std::string &in_fen, const std::string &in_algebraic)
 {
-	const size_t currIndex = boardStates.size() + 1;
+	const int currIndex = (int)boardStates.size() + 1;
 	BoardStateButton *newState = new BoardStateButton(in_fen, in_algebraic, currIndex);
 	boardStates.add(newState);
 	setColour(3, Colours::white);
@@ -740,7 +739,7 @@ void NotationComponent::resized()
 	
 	end.onClick = [this, boardComponent]
 	{
-		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
+		const int lastStateIndex = (int)movesComponent.GetBoardStatesSize();
 		SetStateIndex(lastStateIndex);
 		if (lastStateIndex == 0)
 			return;
@@ -752,8 +751,8 @@ void NotationComponent::resized()
 	
 	next.onClick = [this, boardComponent]
 	{
-		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
-		const size_t stateIndex = GetStateIndex();
+		const int lastStateIndex = (int)movesComponent.GetBoardStatesSize();
+		const int stateIndex = GetStateIndex();
 		if (stateIndex >= lastStateIndex)
 			return;
 		SetStateIndex(stateIndex + 1);
@@ -765,8 +764,8 @@ void NotationComponent::resized()
 	
 	prev.onClick = [this, boardComponent]
 	{
-		const size_t lastStateIndex = movesComponent.GetBoardStatesSize();
-		const size_t stateIndex = GetStateIndex();
+		const int lastStateIndex = (int)movesComponent.GetBoardStatesSize();
+		const int stateIndex = GetStateIndex();
 		if (stateIndex < 1 || lastStateIndex < stateIndex)
 			return;
 		SetStateIndex(stateIndex - 1);

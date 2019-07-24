@@ -2876,10 +2876,6 @@
     <CopyFileToFolders Include="..\..\Images\circle.png">
       <Filter>ChessGUI\Resources</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\Images\BlackBackground.jpg">
-      <Filter>ChessGUI\Resources</Filter>
-    </Image>
+    <CopyFileToFolders Include="..\..\Images\BlackBackground.jpg" />
   </ItemGroup>
 </Project>

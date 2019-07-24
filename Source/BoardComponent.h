@@ -56,7 +56,7 @@ private:
 class BoardStateButton : public TextButton
 {
 public:
-	BoardStateButton(const std::string in_fen, const std::string in_algebraic, const size_t in_dex) :
+	BoardStateButton(const std::string in_fen, const std::string in_algebraic, const int in_dex) :
 		fen(in_fen), algebraic(in_algebraic), myIndex(in_dex) {
 		setName(in_algebraic);
 	}
@@ -67,7 +67,7 @@ public:
 	//void SetActive(const bool inActive) { setToggleState(inActive, sendNotification); repaint(); }
 
 private:
-	size_t myIndex;
+	int myIndex;
 	std::string fen;
 	std::string algebraic;
 	//==============================================================================
@@ -83,8 +83,8 @@ public:
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { boardStates.clear(); }
 	int GetNumberofMoves() { return int(((double)boardStates.size() / 2) + 0.6); }
-	BoardStateButton* GetNode(const size_t index) { return boardStates[index]; }
-	void SetActiveNode(const size_t newNode, const size_t oldNode) 
+	BoardStateButton* GetNode(const int index) { return boardStates[index]; }
+	void SetActiveNode(const int newNode, const int oldNode) 
 	{ 
 		if (newNode != oldNode && newNode != 0 && oldNode != 0)
 		{
@@ -158,8 +158,8 @@ public:
 	void addBoardState(const std::string &in_fen, const std::string &in_algebraic);
 	void Reset() { SetStateIndex(0);  movesComponent.Reset(); resized(); }
 	Board* GetBoard() { return myBoard; }
-	void SetStateIndex(const size_t in_dex) { movesComponent.SetActiveNode(in_dex, currentState); currentState = in_dex; }
-	size_t GetStateIndex() { return currentState; }
+	void SetStateIndex(const int in_dex) { movesComponent.SetActiveNode(in_dex, currentState); currentState = in_dex; }
+	int GetStateIndex() { return currentState; }
 	void UpdatePromotionNode() 
 	{ 
 		std::string algebraicStr;
@@ -176,7 +176,7 @@ private:
 	TextButton end;
 	MovesComponent movesComponent;
 	Viewport vpMovesComponent;
-	size_t currentState;
+	int currentState;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NotationComponent)

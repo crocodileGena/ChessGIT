@@ -4,6 +4,7 @@
 #include "consts.h"
 #include <string>
 #include <vector>
+#include <array>
 
 class Piece;
 class NotationNode;
@@ -115,7 +116,7 @@ public:
 	
 	bool MovePiece(const Square inBase, const Square inDest);
 	Piece* GetPiece(const Square inLocation) const;
-	void SetPiece(const Square inLocation, Piece* inPiece) { board[inLocation.GetFile()][inLocation.GetRank()] = inPiece; }
+	void SetPiece(const Square inLocation, Piece* inPiece) { m_board[inLocation.GetFile()*BoardSize + inLocation.GetRank()] = inPiece; }
 	std::vector<Piece*> GetPieces();
 	
 	bool CheckIsCheck();
@@ -147,14 +148,14 @@ public:
 	int	 CalculateBalance() const;
 	void UpdateBalance();
 
-	Color			m_lastColorMoved;
-	Piece*			board[BoardSize][BoardSize];
-	GameNotation	m_gameNotation;
-	std::string		m_status;
-	bool			m_castlingFlag[numCastlingOptions];
-	int				m_halfmoveClock;
-	bool			m_queeningMode;
-	int				m_balance = 0;
+	Color									m_lastColorMoved;
+	std::array<Piece*, BoardSize*BoardSize>	m_board;
+	GameNotation							m_gameNotation;
+	std::string								m_status;
+	bool									m_castlingFlag[numCastlingOptions] = { 0 };
+	int										m_halfmoveClock;
+	bool									m_queeningMode;
+	int										m_balance = 0;
 
 private:
 	void CommitMove(Piece * currPiece, const Square &inBase, const Square &inDest);
@@ -163,5 +164,5 @@ private:
 
 	size_t m_currNotationIndex;
 	Square m_enPassantSquare;
-	CheckOrMate m_checkOrMate;
+	CheckOrMate m_checkOrMate = eNone;
 };

@@ -18,7 +18,7 @@ m_balance(in_board.m_balance)
 	for (int i = 0; i < BoardSize; ++i)
 		for (int j = 0; j < BoardSize; ++j)
 			{
-				board[i][j] = in_board.board[i][j];
+				SetPiece({ i,j }, in_board.GetPiece({ i,j }));
 			}
 
 	for (int i = 0; i < numCastlingOptions; ++i)
@@ -51,7 +51,6 @@ m_lastColorMoved(eBlack),
 m_status(""),
 m_halfmoveClock(0),
 m_queeningMode(false),
-m_checkOrMate(eNone),
 m_currNotationIndex(0)
 {
 	for (int i = 0; i < BoardSize; ++i)
@@ -89,39 +88,39 @@ void Board::ResetBoard()
 			}
 		}
 
-	board[A][One] = new Rook(Color::eWhite);
-	board[A][Two] = new Pawn(Color::eWhite);
-	board[B][One] = new Knight(Color::eWhite);
-	board[B][Two] = new Pawn(Color::eWhite);
-	board[C][One] = new Bishop(Color::eWhite);
-	board[C][Two] = new Pawn(Color::eWhite);
-	board[D][One] = new Queen(Color::eWhite);
-	board[D][Two] = new Pawn(Color::eWhite);
-	board[E][One] = new King(Color::eWhite);
-	board[E][Two] = new Pawn(Color::eWhite);
-	board[F][One] = new Bishop(Color::eWhite);
-	board[F][Two] = new Pawn(Color::eWhite);
-	board[G][One] = new Knight(Color::eWhite);
-	board[G][Two] = new Pawn(Color::eWhite);
-	board[H][One] = new Rook(Color::eWhite);
-	board[H][Two] = new Pawn(Color::eWhite);
+	SetPiece({A, One}, new Rook(Color::eWhite));
+	SetPiece({A, Two}, new Pawn(Color::eWhite));
+	SetPiece({B, One}, new Knight(Color::eWhite));
+	SetPiece({B, Two}, new Pawn(Color::eWhite));
+	SetPiece({C, One}, new Bishop(Color::eWhite));
+	SetPiece({C, Two}, new Pawn(Color::eWhite));
+	SetPiece({D, One}, new Queen(Color::eWhite));
+	SetPiece({D, Two}, new Pawn(Color::eWhite));
+	SetPiece({E, One}, new King(Color::eWhite));
+	SetPiece({E, Two}, new Pawn(Color::eWhite));
+	SetPiece({F, One}, new Bishop(Color::eWhite));
+	SetPiece({F, Two}, new Pawn(Color::eWhite));
+	SetPiece({G, One}, new Knight(Color::eWhite));
+	SetPiece({G, Two}, new Pawn(Color::eWhite));
+	SetPiece({H, One}, new Rook(Color::eWhite));
+	SetPiece({H, Two}, new Pawn(Color::eWhite));
 
-	board[A][Eight] = new Rook(Color::eBlack);
-	board[A][Seven] = new Pawn(Color::eBlack);
-	board[B][Eight] = new Knight(Color::eBlack);
-	board[B][Seven] = new Pawn(Color::eBlack);
-	board[C][Eight] = new Bishop(Color::eBlack);
-	board[C][Seven] = new Pawn(Color::eBlack);
-	board[D][Eight] = new Queen(Color::eBlack);
-	board[D][Seven] = new Pawn(Color::eBlack);
-	board[E][Eight] = new King(Color::eBlack);
-	board[E][Seven] = new Pawn(Color::eBlack);
-	board[F][Eight] = new Bishop(Color::eBlack);
-	board[F][Seven] = new Pawn(Color::eBlack);
-	board[G][Eight] = new Knight(Color::eBlack);
-	board[G][Seven] = new Pawn(Color::eBlack);
-	board[H][Eight] = new Rook(Color::eBlack);
-	board[H][Seven] = new Pawn(Color::eBlack);
+	SetPiece({A, Eight}, new Rook(Color::eBlack));
+	SetPiece({A, Seven}, new Pawn(Color::eBlack));
+	SetPiece({B, Eight}, new Knight(Color::eBlack));
+	SetPiece({B, Seven}, new Pawn(Color::eBlack));
+	SetPiece({C, Eight}, new Bishop(Color::eBlack));
+	SetPiece({C, Seven}, new Pawn(Color::eBlack));
+	SetPiece({D, Eight}, new Queen(Color::eBlack));
+	SetPiece({D, Seven}, new Pawn(Color::eBlack));
+	SetPiece({E, Eight}, new King(Color::eBlack));
+	SetPiece({E, Seven}, new Pawn(Color::eBlack));
+	SetPiece({F, Eight}, new Bishop(Color::eBlack));
+	SetPiece({F, Seven}, new Pawn(Color::eBlack));
+	SetPiece({G, Eight}, new Knight(Color::eBlack));
+	SetPiece({G, Seven}, new Pawn(Color::eBlack));
+	SetPiece({H, Eight}, new Rook(Color::eBlack));
+	SetPiece({H, Seven}, new Pawn(Color::eBlack));
 }
 
 void Board::PrintBoard()
@@ -839,7 +838,7 @@ Piece* Board::GetPiece(const Square inLocation) const
 		inLocation.GetRank() < One || inLocation.GetRank() > Eight)
 		return nullptr;
 		
-	return board[inLocation.GetFile()][inLocation.GetRank()];
+	return m_board[inLocation.GetFile()*BoardSize + inLocation.GetRank()];
 }
 
 int Board::CalculateBalance() const
@@ -858,5 +857,7 @@ int Board::CalculateBalance() const
 			}
 		}
 	}
+
+	//std::for_each(m_board.begin()->begin(), m_board.end()->end(), [](auto currPiece) { std::cout << currPiece->m_name << " "; });
 	return retVal;
 }

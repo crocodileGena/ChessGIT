@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cctype>
 #include "Pieces.h"
-
 Board::Board(const Board& in_board) : 
 m_lastColorMoved(in_board.m_lastColorMoved),
 m_halfmoveClock(in_board.m_halfmoveClock),
@@ -367,7 +366,15 @@ bool Board::MovePiece(const Square inBase, const Square inDest)
 
 void Board::UpdateBalance()
 {
-	const int currentBalance = CalculateBalance();
+	int currentBalance = 0;
+	std::for_each(m_board.begin(), m_board.end(), [&](const Piece* const currPiece)
+	{
+		if (currPiece != nullptr)
+		{
+			const int sign = currPiece->m_color == eWhite ? 1 : -1;
+			currentBalance += sign * currPiece->m_worth;
+		}
+	});
 	SetBalance(currentBalance);
 }
 
@@ -839,25 +846,4 @@ Piece* Board::GetPiece(const Square inLocation) const
 		return nullptr;
 		
 	return m_board[inLocation.GetFile()*BoardSize + inLocation.GetRank()];
-}
-
-int Board::CalculateBalance() const
-{
-	int retVal(0);
-
-	for (int i = 0; i < BoardSize; ++i)
-	{
-		for (int j = 0; j < BoardSize; ++j)
-		{
-			Piece* currPiece = GetPiece({ i,j });
-			if (currPiece != nullptr)
-			{
-				const int sign = currPiece->m_color == eWhite ? 1 : -1;
-				retVal += sign*currPiece->m_worth;
-			}
-		}
-	}
-
-	//std::for_each(m_board.begin()->begin(), m_board.end()->end(), [](auto currPiece) { std::cout << currPiece->m_name << " "; });
-	return retVal;
 }

@@ -145,7 +145,6 @@ public:
 	void RemoveUndefendedCheckMoves(std::vector<Move>& legalMoves) const;
 	bool IsADraw(const bool noLegalMoves, const std::string piecesPosition);
 	void LoadFEN(const std::string in_position = fenOpening, const size_t nodeNumber = 1);
-	int	 CalculateBalance() const;
 	void UpdateBalance();
 
 	Color									m_lastColorMoved;

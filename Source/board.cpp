@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include "Pieces.h"
+
 Board::Board(const Board& in_board) : 
 m_lastColorMoved(in_board.m_lastColorMoved),
 m_halfmoveClock(in_board.m_halfmoveClock),
